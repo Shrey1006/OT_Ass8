@@ -1,6 +1,6 @@
 /**
  * @file test_main.cpp
- * @brief Unit tests and correctness checks for 0/1 Knapsack, Max-Cut, and QUBO/Ising models.
+ * @brief Unit tests and correctness checks for 0/1 Knapsack, Max-Cut, and Feature Selection QUBO.
  *
  * Verifies:
  *  1. Input validation guards (empty lists, non-positive capacities, negative values).
@@ -13,6 +13,8 @@
  *  8. Knapsack constraint encoding as a QUBO with quadratic penalty terms.
  *  9. Max-Cut on random graphs: Greedy vs Exhaustive vs Simulated Annealing.
  *  10. Export of Max-Cut QUBO to JSON file for Track C.
+ *  11. Feature selection (choose k of n by mRMR): QUBO vs Greedy on analytical counter-example
+ *      and synthetic benchmark (10 stochastic runs, Mean +/- Std).
  *
  * Optimization Techniques | Lab Assignment 8 (Track B)
  */
@@ -20,10 +22,12 @@
 #include "knapsack.hpp"
 #include "qubo.hpp"
 #include "maxcut.hpp"
+#include "feature_selection.hpp"
 #include <iostream>
 #include <cassert>
 #include <iomanip>
 #include <cmath>
+
 #ifdef _WIN32
 #include <direct.h>
 #define MKDIR(d) _mkdir(d)
@@ -137,7 +141,6 @@ void test_random_instance_suite() {
 void test_qubo_ising_conversion() {
     std::cout << "[TEST] Running explicit Binary-to-Spin x = (1 + s)/2 QUBO-Ising equivalence test..." << std::endl;
 
-    // Construct arbitrary 4x4 symmetric/upper-triangular QUBO
     opt::QUBO qubo(4);
     qubo.at(0, 0) = -2.0;
     qubo.at(1, 1) = 3.5;
@@ -149,19 +152,15 @@ void test_qubo_ising_conversion() {
     qubo.at(1, 3) = 3.0;
     qubo.at(2, 3) = -0.5;
 
-    // Convert to Ising Hamiltonian
     opt::IsingModel ising = qubo.to_ising();
 
-    // Test across all 2^4 = 16 configurations
     for (uint32_t mask = 0; mask < 16; ++mask) {
         std::vector<int> x(4);
         std::vector<int> s(4);
 
         for (size_t i = 0; i < 4; ++i) {
             x[i] = (mask >> i) & 1;
-            // Reverse of x = (1 + s)/2 => s = 2*x - 1
             s[i] = 2 * x[i] - 1;
-            // Verify forward relation holds: x == (1 + s) / 2
             assert(x[i] == (1 + s[i]) / 2);
         }
 
@@ -177,26 +176,18 @@ void test_qubo_ising_conversion() {
 void test_knapsack_qubo_penalty() {
     std::cout << "[TEST] Running Knapsack QUBO penalty-term encoding verification..." << std::endl;
 
-    // Simple 3-item instance:
-    // v = [60, 100, 120], w = [10, 20, 30], W = 50
-    // Ground truth exact optimum: items 1 and 2 selected (total value 220, weight 50)
     std::vector<double> values = {60.0, 100.0, 120.0};
     std::vector<double> weights = {10.0, 20.0, 30.0};
     double capacity = 50.0;
 
-    // Penalty factor P = 2 * max(v) = 240
     opt::QUBO knapsack_qubo = opt::QUBO::from_knapsack(values, weights, capacity, 240.0);
-
-    // Solve QUBO via exhaustive brute-force
     auto res_bf = opt::QUBOSolver::solve_brute_force(knapsack_qubo);
 
-    // Verify first 3 bits (decision variables x0, x1, x2)
     assert(res_bf.best_bitstring.size() >= 3);
     assert(res_bf.best_bitstring[0] == 0); // Item 0 not taken
     assert(res_bf.best_bitstring[1] == 1); // Item 1 taken
     assert(res_bf.best_bitstring[2] == 1); // Item 2 taken
 
-    // Verify weight constraint satisfaction
     double total_wt = res_bf.best_bitstring[0] * weights[0] +
                       res_bf.best_bitstring[1] * weights[1] +
                       res_bf.best_bitstring[2] * weights[2];
@@ -213,30 +204,24 @@ void test_knapsack_qubo_penalty() {
 void test_maxcut_graph_algorithms() {
     std::cout << "[TEST] Running Max-Cut on Random Graph: Greedy, Exhaustive, QUBO, and Simulated Annealing..." << std::endl;
 
-    // Generate random 6-node graph with seed 42
     auto graph = opt::MaxCutGraph::generate_erdos_renyi(6, 0.6, 1.0, 3.0, 42);
     assert(graph.num_nodes() == 6);
     assert(graph.num_edges() > 0);
 
-    // 1. Solve via Exhaustive search (Exact global optimum)
     auto opt_res = graph.solve_exhaustive();
     double opt_cut = opt_res.first;
     assert(!opt_res.second.empty());
 
-    // 2. Solve via Greedy heuristic
     auto greedy_res = graph.solve_greedy();
     double greedy_cut = greedy_res.first;
     assert(!greedy_res.second.empty());
     assert(greedy_cut <= opt_cut);
-    assert(greedy_cut >= 0.5 * opt_cut); // Passes standard approximation bound
+    assert(greedy_cut >= 0.5 * opt_cut);
 
-    // 3. Solve via QUBO Brute-Force
     opt::QUBO qubo = graph.to_qubo();
     auto res_bf = opt::QUBOSolver::solve_brute_force(qubo);
-    // Remember: min x^T Q x = -MaxCut => MaxCut = -min_energy
     assert(std::abs(-res_bf.best_energy - opt_cut) < 1e-10);
 
-    // 4. Solve via Simulated Annealing across 10 deterministic seeds (Rule 2)
     std::cout << "  Running 10 stochastic Simulated Annealing runs on Max-Cut QUBO..." << std::endl;
     double sa_cut_sum = 0.0;
     double sa_cut_sq_sum = 0.0;
@@ -259,18 +244,124 @@ void test_maxcut_graph_algorithms() {
               << " | Greedy=" << greedy_cut
               << " | Simulated Annealing (10 runs): " << mean_cut << " +/- " << std_cut << std::endl;
 
-    // 5. Export JSON for Track C
-    std::string json_path = "results/maxcut_qubo.json";
+    std::string json_path = "B_discrete/results/maxcut_qubo.json";
+    {
+        std::ofstream probe(json_path);
+        if (!probe.is_open()) {
+            json_path = "results/maxcut_qubo.json";
+        }
+    }
     graph.export_to_json(json_path);
 
     std::cout << "  -> Max-Cut graph algorithms, QUBO mapping, and JSON export verified." << std::endl;
+}
+
+void test_feature_selection_qubo_vs_greedy() {
+    std::cout << "[TEST] Running Feature Selection (mRMR): QUBO vs Greedy Comparison..." << std::endl;
+
+    // 1. Analytical counter-example where Greedy forward selection fails:
+    // 4 candidate features, choose k = 2, lambda = 1.0:
+    // Feature 0: relevance = 0.90 (highest)
+    // Feature 1: relevance = 0.85
+    // Feature 2: relevance = 0.85
+    // Feature 3: relevance = 0.10
+    // Redundancy: C01 = 0.90, C02 = 0.90, C03 = 0.10, C12 = 0.00, C13 = 0.10, C23 = 0.10
+    //
+    // Greedy path:
+    //   Step 1: picks Feature 0 (rel=0.90)
+    //   Step 2: marginal gain for F1: 0.85 - 0.90 = -0.05
+    //           marginal gain for F2: 0.85 - 0.90 = -0.05
+    //           marginal gain for F3: 0.10 - 0.10 =  0.00 (highest gain!)
+    //   Greedy picks {0, 3} -> Score = 0.90 + 0.10 - 0.10 = 0.90
+    //
+    // Global optimum (QUBO):
+    //   Picks {1, 2} -> Score = 0.85 + 0.85 - 0.00 = 1.70 (88.9% better than Greedy!)
+    {
+        std::vector<double> rel = {0.90, 0.85, 0.85, 0.10};
+        std::vector<std::vector<double>> red = {
+            {0.00, 0.90, 0.90, 0.10},
+            {0.90, 0.00, 0.00, 0.10},
+            {0.90, 0.00, 0.00, 0.10},
+            {0.10, 0.10, 0.10, 0.00}
+        };
+
+        opt::FeatureSelectionProblem fs(4, 2, rel, red, 1.0);
+
+        // Greedy
+        auto greedy_res = fs.solve_greedy();
+        assert(greedy_res.is_feasible);
+        assert(greedy_res.selected_features.size() == 2);
+        assert(std::abs(greedy_res.objective_score - 0.90) < 1e-5);
+
+        // QUBO formulation
+        auto qubo_pair = fs.to_qubo(20.0);
+        const auto& qubo = qubo_pair.first;
+        auto qubo_res = opt::QUBOSolver::solve_brute_force(qubo);
+
+        auto decoded_qubo = fs.decode_result("QUBO Brute-Force", qubo_res.best_bitstring, qubo_res.runtime_us);
+        assert(decoded_qubo.is_feasible);
+        assert(std::abs(decoded_qubo.objective_score - 1.70) < 1e-5);
+
+        // Verify QUBO strictly beats Greedy
+        assert(decoded_qubo.objective_score > greedy_res.objective_score);
+
+        std::cout << "  -> Analytical instance: Greedy Score = " << greedy_res.objective_score
+                  << " vs. QUBO Score = " << decoded_qubo.objective_score
+                  << " (QUBO is " << ((decoded_qubo.objective_score - greedy_res.objective_score) / greedy_res.objective_score) * 100.0
+                  << "% superior due to non-myopic global coupling)." << std::endl;
+    }
+
+    // 2. Synthetic benchmark problem (n = 12 candidate features, select k = 4):
+    {
+        auto fs_bench = opt::FeatureSelectionProblem::generate_synthetic(12, 4, 1.0, 42);
+
+        auto greedy_res = fs_bench.solve_greedy();
+        assert(greedy_res.is_feasible);
+
+        auto qubo_pair = fs_bench.to_qubo();
+        const auto& qubo = qubo_pair.first;
+
+        auto bf_res = opt::QUBOSolver::solve_brute_force(qubo);
+        auto decoded_bf = fs_bench.decode_result("QUBO Exact", bf_res.best_bitstring, bf_res.runtime_us);
+        assert(decoded_bf.is_feasible);
+        assert(decoded_bf.objective_score >= greedy_res.objective_score);
+
+        // 10 stochastic Simulated Annealing runs (Rule 2)
+        std::cout << "  Running 10 stochastic Simulated Annealing runs on Feature Selection QUBO..." << std::endl;
+        const size_t num_runs = 10;
+        double sa_score_sum = 0.0;
+        double sa_score_sq_sum = 0.0;
+        size_t feasible_count = 0;
+
+        for (size_t s = 0; s < num_runs; ++s) {
+            unsigned int seed = 301 + static_cast<unsigned int>(s);
+            auto sa_res = opt::QUBOSolver::solve_simulated_annealing(qubo, 3000, 15.0, 0.01, seed);
+            auto decoded_sa = fs_bench.decode_result("SA", sa_res.best_bitstring, sa_res.runtime_us);
+            if (decoded_sa.is_feasible) {
+                ++feasible_count;
+                sa_score_sum += decoded_sa.objective_score;
+                sa_score_sq_sum += decoded_sa.objective_score * decoded_sa.objective_score;
+            }
+        }
+
+        assert(feasible_count == num_runs); // All 10 runs strictly satisfied cardinality constraint k=4
+        double mean_sa = sa_score_sum / static_cast<double>(num_runs);
+        double var_sa = (sa_score_sq_sum - num_runs * mean_sa * mean_sa) / static_cast<double>(num_runs - 1);
+        double std_sa = std::sqrt(std::max(0.0, var_sa));
+
+        std::cout << "  -> Synthetic Benchmark (n=12, k=4): Greedy Score = " << greedy_res.objective_score
+                  << " | QUBO Exact = " << decoded_bf.objective_score
+                  << " | QUBO Simulated Annealing (10 runs): " << mean_sa << " +/- " << std_sa << std::endl;
+    }
+
+    std::cout << "  -> Feature selection QUBO formulation and greedy comparison verified." << std::endl;
 }
 
 } // namespace
 
 int main() {
     std::cout << "====================================================" << std::endl;
-    std::cout << " Running Track B Unit Tests: Knapsack & Max-Cut QUBO" << std::endl;
+    std::cout << " Running Track B Unit Tests: Discrete & QUBO Solvers" << std::endl;
     std::cout << "====================================================" << std::endl;
 
     try {
@@ -280,13 +371,14 @@ int main() {
         test_qubo_ising_conversion();
         test_knapsack_qubo_penalty();
         test_maxcut_graph_algorithms();
+        test_feature_selection_qubo_vs_greedy();
     } catch (const std::exception& e) {
         std::cerr << "[ERROR] Unhandled exception in unit test: " << e.what() << std::endl;
         return 1;
     }
 
     std::cout << "====================================================" << std::endl;
-    std::cout << " All Track B Knapsack & Max-Cut QUBO Tests Passed (100% OK)." << std::endl;
+    std::cout << " All Track B Knapsack, Max-Cut & Feature Selection Tests Passed (100% OK)." << std::endl;
     std::cout << "====================================================" << std::endl;
     return 0;
 }
