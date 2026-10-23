@@ -1,5 +1,6 @@
 #include "toy_compiler.hpp"
 #include "toy_optimizer.hpp"
+#include "toy_regalloc.hpp"
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -34,123 +35,90 @@ std::vector<BenchmarkEntry> get_all_benchmark_programs() {
 
 int main() {
     std::cout << "=======================================================================================================\n";
-    std::cout << " Track F2: Compiler Optimization Passes (Folding, Propagation, DCE, CSE, Strength Reduction)          \n";
+    std::cout << " Track F3: Register Allocation as Graph Coloring (Greedy Kempe vs. Exact BnB DSATUR)                  \n";
     std::cout << "=======================================================================================================\n";
 
     auto benchmarks = get_all_benchmark_programs();
     toy::Optimizer optimizer;
 
-    std::ofstream csv("F_compiler/results/optimization_passes_benchmark.csv");
+    // We evaluate register allocation with target K = 3 physical registers to induce spilling pressure
+    const int TARGET_K = 3;
+
+    std::ofstream csv("F_compiler/results/register_allocation_benchmark.csv");
     if (csv.is_open()) {
-        csv << "id,name,unopt_tac,opt_tac,tac_reduction_pct,unopt_cycles,opt_cycles,cycles_reduction_pct,folded,strength_red,cses,dces,output_match\n";
+        csv << "id,name,vars_count,greedy_spills,exact_spills,greedy_instrs,exact_instrs,greedy_bytes,exact_bytes,greedy_time_us,exact_time_us\n";
     }
 
+    std::cout << "Target Physical Register Budget: K = " << TARGET_K << "\n\n";
     std::cout << std::left << std::setw(4) << "ID"
-              << std::setw(22) << "Program Name"
-              << std::setw(12) << "Unopt TAC"
-              << std::setw(10) << "Opt TAC"
-              << std::setw(12) << "TAC Red(%)"
-              << std::setw(14) << "Unopt Cycles"
-              << std::setw(12) << "Opt Cycles"
-              << std::setw(14) << "Cycle Red(%)"
-              << std::setw(10) << "Equiv" << "\n";
+              << std::setw(20) << "Program Name"
+              << std::setw(8) << "Vars"
+              << std::setw(15) << "Greedy Spills"
+              << std::setw(15) << "Exact Spills"
+              << std::setw(15) << "Greedy Instrs"
+              << std::setw(15) << "Exact Instrs"
+              << std::setw(14) << "Greedy(us)"
+              << std::setw(12) << "Exact(us)" << "\n";
     std::cout << "-------------------------------------------------------------------------------------------------------\n";
 
-    int total_unopt_tac = 0;
-    int total_opt_tac = 0;
-    int64_t total_unopt_cycles = 0;
-    int64_t total_opt_cycles = 0;
-    int all_passed = 0;
+    int total_greedy_spills = 0;
+    int total_exact_spills = 0;
+    int total_greedy_instrs = 0;
+    int total_exact_instrs = 0;
+    double total_greedy_time = 0.0;
+    double total_exact_time = 0.0;
 
     for (const auto& bench : benchmarks) {
-        // 1. Unoptimized Pipeline
+        // Compile to optimized TAC
         toy::Lexer lexer(bench.source);
         toy::Parser parser(lexer.tokenize_all());
-        auto ast = parser.parse_program();
+        auto unopt_tac = toy::TACGenerator().generate(parser.parse_program());
+        auto opt_tac = optimizer.optimize(unopt_tac);
 
-        toy::TACGenerator tac_gen;
-        auto unopt_tac = tac_gen.generate(ast);
+        // Build Interference Graph via Liveness Analysis
+        auto graph = toy::build_interference_graph(opt_tac);
 
-        toy::BytecodeEmitter emitter;
-        auto unopt_bc = emitter.compile(unopt_tac);
+        // 1. Solve with Greedy Kempe
+        auto alloc_greedy = toy::allocate_registers_greedy(graph, TARGET_K);
+        auto reg_stats_greedy = toy::lower_to_register_machine(opt_tac, alloc_greedy);
 
-        toy::StackVM vm_unopt;
-        auto unopt_res = vm_unopt.execute(unopt_bc);
+        // 2. Solve with Exact BnB DSATUR
+        auto alloc_exact = toy::allocate_registers_exact(graph, TARGET_K);
+        auto reg_stats_exact = toy::lower_to_register_machine(opt_tac, alloc_exact);
 
-        // 2. Optimized Pipeline
-        toy::Optimizer::OptimizationStats opt_stats;
-        auto opt_tac = optimizer.optimize(unopt_tac, &opt_stats);
-
-        auto opt_bc = emitter.compile(opt_tac);
-
-        toy::StackVM vm_opt;
-        auto opt_res = vm_opt.execute(opt_bc);
-
-        // 3. Verification & Comparison
-        bool match = (unopt_res.output == opt_res.output) && (opt_res.output == bench.expected_output);
-        if (match) all_passed++;
-
-        double tac_red_pct = 100.0 * (1.0 - static_cast<double>(opt_tac.size()) / unopt_tac.size());
-        double cycle_red_pct = 100.0 * (1.0 - static_cast<double>(opt_res.cycles_executed) / unopt_res.cycles_executed);
-
-        total_unopt_tac += unopt_tac.size();
-        total_opt_tac += opt_tac.size();
-        total_unopt_cycles += unopt_res.cycles_executed;
-        total_opt_cycles += opt_res.cycles_executed;
+        total_greedy_spills += alloc_greedy.spill_count;
+        total_exact_spills += alloc_exact.spill_count;
+        total_greedy_instrs += reg_stats_greedy.total_instructions;
+        total_exact_instrs += reg_stats_exact.total_instructions;
+        total_greedy_time += alloc_greedy.compile_time_us;
+        total_exact_time += alloc_exact.compile_time_us;
 
         std::cout << std::left << std::setw(4) << bench.id
-                  << std::setw(22) << bench.name
-                  << std::setw(12) << unopt_tac.size()
-                  << std::setw(10) << opt_tac.size()
+                  << std::setw(20) << bench.name
+                  << std::setw(8) << graph.num_vertices()
+                  << std::setw(15) << alloc_greedy.spill_count
+                  << std::setw(15) << alloc_exact.spill_count
+                  << std::setw(15) << reg_stats_greedy.total_instructions
+                  << std::setw(15) << reg_stats_exact.total_instructions
                   << std::fixed << std::setprecision(1)
-                  << std::setw(12) << tac_red_pct
-                  << std::setw(14) << unopt_res.cycles_executed
-                  << std::setw(12) << opt_res.cycles_executed
-                  << std::setw(14) << cycle_red_pct
-                  << std::setw(10) << (match ? "[PASS]" : "[FAIL]") << "\n";
+                  << std::setw(14) << alloc_greedy.compile_time_us
+                  << std::setw(12) << alloc_exact.compile_time_us << "\n";
 
         if (csv.is_open()) {
             csv << bench.id << "," << bench.name << ","
-                << unopt_tac.size() << "," << opt_tac.size() << ","
-                << tac_red_pct << ","
-                << unopt_res.cycles_executed << "," << opt_res.cycles_executed << ","
-                << cycle_red_pct << ","
-                << opt_stats.constants_folded << ","
-                << opt_stats.strength_reductions << ","
-                << opt_stats.cse_eliminations << ","
-                << opt_stats.dead_instructions_removed << ","
-                << (match ? "true" : "false") << "\n";
+                << graph.num_vertices() << ","
+                << alloc_greedy.spill_count << "," << alloc_exact.spill_count << ","
+                << reg_stats_greedy.total_instructions << "," << reg_stats_exact.total_instructions << ","
+                << reg_stats_greedy.code_size_bytes << "," << reg_stats_exact.code_size_bytes << ","
+                << alloc_greedy.compile_time_us << "," << alloc_exact.compile_time_us << "\n";
         }
     }
 
     std::cout << "=======================================================================================================\n";
-    double overall_tac_red = 100.0 * (1.0 - static_cast<double>(total_opt_tac) / total_unopt_tac);
-    double overall_cycle_red = 100.0 * (1.0 - static_cast<double>(total_opt_cycles) / total_unopt_cycles);
-
-    std::cout << " TOTAL TAC INSTRUCTIONS : " << total_unopt_tac << " -> " << total_opt_tac 
-              << " (" << std::fixed << std::setprecision(1) << overall_tac_red << "% reduction)\n";
-    std::cout << " TOTAL VM CYCLES        : " << total_unopt_cycles << " -> " << total_opt_cycles 
-              << " (" << std::fixed << std::setprecision(1) << overall_cycle_red << "% reduction)\n";
-    std::cout << " SEMANTIC EQUIVALENCE   : " << all_passed << "/" << benchmarks.size() << " Passed Ground-Truth Check.\n";
+    std::cout << " TOTAL SPILLS         : Greedy = " << total_greedy_spills << " | Exact = " << total_exact_spills << "\n";
+    std::cout << " TOTAL INSTRUCTIONS   : Greedy = " << total_greedy_instrs << " | Exact = " << total_exact_instrs << "\n";
+    std::cout << " TOTAL COMPILE TIME   : Greedy = " << total_greedy_time << " us | Exact = " << total_exact_time << " us\n";
     std::cout << "=======================================================================================================\n";
 
-    // Showcase Program 1 (Arithmetic Constant Folding)
-    std::cout << "\n>>> Pass Deep-Dive: Program 1 (Constant Folding & DCE) <<<\n";
-    toy::Lexer lexer_p1(benchmarks[0].source);
-    toy::Parser parser_p1(lexer_p1.tokenize_all());
-    auto unopt_tac_p1 = toy::TACGenerator().generate(parser_p1.parse_program());
-    toy::Optimizer::OptimizationStats stats_p1;
-    auto opt_tac_p1 = optimizer.optimize(unopt_tac_p1, &stats_p1);
-
-    std::cout << "Unoptimized TAC (16 instructions):\n";
-    for (size_t i = 0; i < unopt_tac_p1.size(); ++i) {
-        std::cout << "  " << std::setw(2) << i << ": " << unopt_tac_p1[i].to_string() << "\n";
-    }
-    std::cout << "\nOptimized TAC (" << opt_tac_p1.size() << " instructions - folded at compile-time):\n";
-    for (size_t i = 0; i < opt_tac_p1.size(); ++i) {
-        std::cout << "  " << std::setw(2) << i << ": " << opt_tac_p1[i].to_string() << "\n";
-    }
-    std::cout << "=======================================================================================================\n";
-
-    return (all_passed == static_cast<int>(benchmarks.size())) ? 0 : 1;
+    return 0;
 }
