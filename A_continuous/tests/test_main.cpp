@@ -1,9 +1,10 @@
 /**
  * @file test_main.cpp
- * @brief Comprehensive unit tests for continuous optimizers and benchmark objectives.
+ * @brief Comprehensive unit tests for continuous optimizers, benchmark objectives,
+ *        and second-order curvature methods.
  *
  * Verifies:
- *  1. Input validation (dimensions, bounds, non-finite values) for optimizers & objectives.
+ *  1. Input validation (dimensions, bounds, non-finite values).
  *  2. Analytical correctness of optimizer single-step updates against manual math.
  *  3. Reset behavior restoring clean initial state.
  *  4. Convergence on a 2D convex quadratic surface.
@@ -14,12 +15,19 @@
  *     - SaddlePoint (f(x, y) = x^2 - y^2)
  *     - Rastrigin (highly multimodal)
  *     - Himmelblau (4 distinct minima)
+ *  6. Second-order methods against known solutions:
+ *     - Pure Newton method exact 1-step solve on quadratic and convergence on Rosenbrock.
+ *     - Gauss-Newton nonlinear curve fitting recovering ground truth parameters.
+ *     - Finite-difference Hessian-Vector Product (HVP) matching exact matrix product.
+ *     - Diagonal Fisher Information Matrix matching analytical expectations.
+ *     - Low-rank L-BFGS curvature approximation satisfying the inverse secant equation.
  *
  * Optimization Techniques | Lab Assignment 8 (Track A)
  */
 
 #include "optimizers.hpp"
 #include "objectives.hpp"
+#include "second_order.hpp"
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -282,7 +290,6 @@ void test_objectives_and_finite_differences() {
 
     // 1. Input validation on objective functions
     for (const auto& obj : objectives) {
-        // Dimension mismatch checks
         try {
             obj->value({1.0});
             assert(false && "Failed to throw on 1D input for 2D objective");
@@ -293,7 +300,6 @@ void test_objectives_and_finite_differences() {
             assert(false && "Failed to throw on 3D input for 2D objective");
         } catch (const std::invalid_argument&) {}
 
-        // Non-finite input checks
         try {
             obj->value({std::numeric_limits<double>::quiet_NaN(), 1.0});
             assert(false && "Failed to throw on NaN input");
@@ -305,13 +311,12 @@ void test_objectives_and_finite_differences() {
         } catch (const std::invalid_argument&) {}
     }
 
-    // Invalid parameters for Rosenbrock
     try {
         opt::Rosenbrock invalid_rosen(1.0, -5.0);
         assert(false && "Failed to throw on negative b parameter");
     } catch (const std::invalid_argument&) {}
 
-    // 2. Test points spanning diverse regions: origin, positive, negative, mixed
+    // 2. Test points spanning diverse regions
     const std::vector<std::vector<double>> test_points = {
         {0.0, 0.0},
         {1.2, -0.8},
@@ -322,10 +327,9 @@ void test_objectives_and_finite_differences() {
     };
 
     const double fd_epsilon = 1e-6;
-    const double tolerance = 1e-4; // Central difference error is O(h^2) = 1e-12 + rounding
+    const double tolerance = 1e-4;
 
     for (const auto& obj : objectives) {
-        std::cout << "  -> Verifying analytic vs finite-differences for: " << obj->name() << std::endl;
         for (const auto& pt : test_points) {
             auto grad_analytic = obj->gradient(pt);
             auto grad_fd = obj->finite_difference_gradient(pt, fd_epsilon);
@@ -335,41 +339,30 @@ void test_objectives_and_finite_differences() {
 
             for (size_t d = 0; d < obj->dimension(); ++d) {
                 const double diff = std::abs(grad_analytic[d] - grad_fd[d]);
-                if (diff > tolerance) {
-                    std::cerr << "Mismatch on " << obj->name() << " at (" << pt[0] << ", " << pt[1]
-                              << ") dim " << d << ": analytic=" << grad_analytic[d]
-                              << " vs fd=" << grad_fd[d] << " (diff=" << diff << ")" << std::endl;
-                    assert(false);
-                }
+                assert(diff <= tolerance);
             }
         }
     }
 
     // 3. Specific algebraic checks for key properties
-    // SaddlePoint: f(0,0)=0, gradient=(0,0) is a saddle point
     {
         opt::SaddlePoint saddle;
         assert(saddle.value({0.0, 0.0}) == 0.0);
         auto g = saddle.gradient({0.0, 0.0});
         assert(g[0] == 0.0 && g[1] == 0.0);
-        // Convex along x: f(1, 0) = 1 > 0
         assert(saddle.value({1.0, 0.0}) == 1.0);
-        // Concave along y: f(0, 1) = -1 < 0
         assert(saddle.value({0.0, 1.0}) == -1.0);
     }
 
-    // StronglyConvexQuadratic condition number
     {
         opt::StronglyConvexQuadratic scq;
         assert(approx_equal(scq.condition_number(), 100.0));
-        // Hessian is diag(1, 100)
         auto g1 = scq.gradient({1.0, 0.0});
         auto g2 = scq.gradient({0.0, 1.0});
         assert(approx_equal(g1[0], 1.0));
         assert(approx_equal(g2[1], 100.0));
     }
 
-    // Rosenbrock global minimum at (1, 1) where f(1, 1) = 0
     {
         opt::Rosenbrock rosen;
         assert(approx_equal(rosen.value({1.0, 1.0}), 0.0));
@@ -378,7 +371,6 @@ void test_objectives_and_finite_differences() {
         assert(approx_equal(g[1], 0.0));
     }
 
-    // Rastrigin global minimum at (0, 0) where f(0, 0) = 0
     {
         opt::Rastrigin rast;
         assert(approx_equal(rast.value({0.0, 0.0}), 0.0));
@@ -387,7 +379,6 @@ void test_objectives_and_finite_differences() {
         assert(approx_equal(g[1], 0.0));
     }
 
-    // Himmelblau: all 4 global minima evaluate to 0
     {
         opt::Himmelblau himm;
         const std::vector<std::vector<double>> minima = {
@@ -407,11 +398,172 @@ void test_objectives_and_finite_differences() {
     std::cout << "  -> All 6 objective functions and finite-difference gradient checks passed." << std::endl;
 }
 
+void test_second_order_methods() {
+    std::cout << "[TEST] Running second-order curvature methods & Gauss-Newton tests..." << std::endl;
+
+    // 1. Pure Newton's method on StronglyConvexQuadratic (exact 1-step solve)
+    {
+        opt::StronglyConvexQuadratic scq;
+        opt::NewtonOptimizer::Options opts;
+        opts.lambda_reg = 0.0;
+        opts.tolerance = 1e-12;
+        opt::NewtonOptimizer newton(opts);
+
+        auto val_fn = [&](const std::vector<double>& x) { return scq.value(x); };
+        auto grad_fn = [&](const std::vector<double>& x) { return scq.gradient(x); };
+        auto hess_fn = [](const std::vector<double>&) -> std::vector<std::vector<double>> {
+            return {{1.0, 0.0}, {0.0, 100.0}};
+        };
+
+        auto res = newton.minimize(val_fn, grad_fn, hess_fn, {10.0, -5.0});
+        assert(res.converged);
+        assert(res.iterations <= 2);
+        assert(approx_equal(res.point[0], 0.0, 1e-12));
+        assert(approx_equal(res.point[1], 0.0, 1e-12));
+        assert(approx_equal(res.final_loss, 0.0, 1e-14));
+        std::cout << "    Newton quadratic 1-step convergence verified." << std::endl;
+    }
+
+    // 2. Newton's method on Rosenbrock from non-trivial start point (-1.2, 1.0)
+    {
+        opt::Rosenbrock rosen(1.0, 100.0);
+        opt::NewtonOptimizer::Options opts;
+        opts.max_iterations = 100;
+        opts.lambda_reg = 1e-4;
+        opts.tolerance = 1e-8;
+        opt::NewtonOptimizer newton(opts);
+
+        auto val_fn = [&](const std::vector<double>& x) { return rosen.value(x); };
+        auto grad_fn = [&](const std::vector<double>& x) { return rosen.gradient(x); };
+        auto hess_fn = [](const std::vector<double>& x) -> std::vector<std::vector<double>> {
+            // f(x, y) = (1 - x)^2 + 100 * (y - x^2)^2
+            // df/dx = 2*(x - 1) - 400*x*(y - x^2) = 2x - 2 - 400xy + 400x^3
+            // df/dy = 200*(y - x^2)
+            // d^2f/dx^2 = 2 - 400y + 1200x^2
+            // d^2f/dxdy = -400x
+            // d^2f/dy^2 = 200
+            double H00 = 2.0 - 400.0 * x[1] + 1200.0 * x[0] * x[0];
+            double H01 = -400.0 * x[0];
+            double H10 = -400.0 * x[0];
+            double H11 = 200.0;
+            return {{H00, H01}, {H10, H11}};
+        };
+
+        auto res = newton.minimize(val_fn, grad_fn, hess_fn, {-1.2, 1.0});
+        assert(res.converged);
+        assert(approx_equal(res.point[0], 1.0, 1e-5));
+        assert(approx_equal(res.point[1], 1.0, 1e-5));
+        assert(res.final_loss < 1e-10);
+        std::cout << "    Newton Rosenbrock convergence to (1, 1) verified." << std::endl;
+    }
+
+    // 3. Gauss-Newton nonlinear least-squares curve fit:
+    // Model: y(x; a, b) = a * exp(-b * x)
+    // Ground truth: a* = 2.5, b* = 1.3
+    {
+        const double a_true = 2.5;
+        const double b_true = 1.3;
+
+        std::vector<double> x_data = {0.0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.5, 3.0};
+        std::vector<double> y_data(x_data.size());
+        for (size_t i = 0; i < x_data.size(); ++i) {
+            y_data[i] = a_true * std::exp(-b_true * x_data[i]);
+        }
+
+        auto model_fn = [](double x, const std::vector<double>& theta) {
+            return theta[0] * std::exp(-theta[1] * x);
+        };
+        auto jacobian_fn = [](double x, const std::vector<double>& theta) -> std::vector<double> {
+            // dy/da = exp(-b * x)
+            // dy/db = -a * x * exp(-b * x)
+            double exp_bx = std::exp(-theta[1] * x);
+            return {exp_bx, -theta[0] * x * exp_bx};
+        };
+
+        opt::GaussNewtonCurveFit gn;
+        // Start from initial guess away from truth: (1.0, 0.5)
+        auto res = gn.fit(x_data, y_data, model_fn, jacobian_fn, {1.0, 0.5});
+
+        assert(res.converged);
+        assert(approx_equal(res.params[0], a_true, 1e-5));
+        assert(approx_equal(res.params[1], b_true, 1e-5));
+        assert(res.sse < 1e-12);
+        std::cout << "    Gauss-Newton curve fit recovered true parameters (a=2.5, b=1.3) with SSE < 1e-12." << std::endl;
+    }
+
+    // 4. Hessian-Vector Product (HVP) test against exact analytical matrix-vector product
+    {
+        // Test function: f(x, y) = x^3 + 2*x*y^2 + y^4
+        // grad = [3*x^2 + 2*y^2, 4*x*y + 4*y^3]
+        // H = [[6*x, 4*y], [4*y, 4*x + 12*y^2]]
+        auto grad_fn = [](const std::vector<double>& x) -> std::vector<double> {
+            return {3.0 * x[0] * x[0] + 2.0 * x[1] * x[1],
+                    4.0 * x[0] * x[1] + 4.0 * std::pow(x[1], 3)};
+        };
+
+        const std::vector<double> x_eval = {1.5, -2.0};
+        const std::vector<double> v_dir = {0.7, -1.3};
+
+        // Exact analytical Hessian * v:
+        // H00 = 6*1.5 = 9.0, H01 = 4*(-2) = -8.0
+        // H10 = -8.0, H11 = 4*1.5 + 12*(-2)^2 = 6 + 48 = 54.0
+        // (H*v)_0 = 9*0.7 + (-8)*(-1.3) = 6.3 + 10.4 = 16.7
+        // (H*v)_1 = (-8)*0.7 + 54*(-1.3) = -5.6 - 70.2 = -75.8
+        const double expected_hvp0 = 16.7;
+        const double expected_hvp1 = -75.8;
+
+        auto hvp_num = opt::hessian_vector_product(grad_fn, x_eval, v_dir, 1e-5);
+        assert(approx_equal(hvp_num[0], expected_hvp0, 1e-3));
+        assert(approx_equal(hvp_num[1], expected_hvp1, 1e-3));
+        std::cout << "    Hessian-Vector Product matches exact analytical Hv within 1e-3." << std::endl;
+    }
+
+    // 5. Diagonal Fisher Information Matrix approximation
+    {
+        // 3 samples with gradients:
+        // g_1 = [2.0, -1.0], g_2 = [-3.0, 0.5], g_3 = [1.0, 2.0]
+        // F0 = (4 + 9 + 1) / 3 = 14 / 3 = 4.666667
+        // F1 = (1 + 0.25 + 4) / 3 = 5.25 / 3 = 1.75
+        std::vector<std::vector<double>> per_sample_grads = {
+            {2.0, -1.0},
+            {-3.0, 0.5},
+            {1.0, 2.0}
+        };
+        auto diag_fisher = opt::compute_diagonal_fisher(per_sample_grads);
+        assert(approx_equal(diag_fisher[0], 14.0 / 3.0, 1e-12));
+        assert(approx_equal(diag_fisher[1], 1.75, 1e-12));
+        std::cout << "    Diagonal Fisher approximation matches analytical expectation." << std::endl;
+    }
+
+    // 6. Low-Rank Curvature Approximation (L-BFGS secant condition)
+    {
+        // Consider positive definite quadratic f(x) = 0.5 * x^T A x with A = [[4, 1], [1, 3]]
+        // grad(x) = A * x
+        auto mat_vec = [](const std::vector<double>& x) -> std::vector<double> {
+            return {4.0 * x[0] + 1.0 * x[1], 1.0 * x[0] + 3.0 * x[1]};
+        };
+
+        const std::vector<double> s = {1.0, 2.0};
+        const std::vector<double> y = mat_vec(s); // y = [4(1)+1(2), 1(1)+3(2)] = [6.0, 7.0]
+
+        opt::LowRankCurvatureLBFGS lbfgs(5);
+        lbfgs.update(s, y);
+
+        // By secant condition: H_k * y = s
+        auto reconstructed_s = lbfgs.multiply_inverse_hessian(y);
+        assert(approx_equal(reconstructed_s[0], s[0], 1e-5));
+        assert(approx_equal(reconstructed_s[1], s[1], 1e-5));
+        std::cout << "    Low-Rank Curvature L-BFGS satisfies secant condition H_k * y = s." << std::endl;
+    }
+
+    std::cout << "  -> All second-order methods and curvature approximations verified." << std::endl;
+}
+
 } // namespace
 
 int main() {
     std::cout << "====================================================" << std::endl;
-    std::cout << " Running Track A Unit Tests: optimizers & objectives" << std::endl;
+    std::cout << " Running Track A Unit Tests: First & Second-Order Methods" << std::endl;
     std::cout << "====================================================" << std::endl;
 
     try {
@@ -420,13 +572,14 @@ int main() {
         test_reset_behavior();
         test_convex_quadratic_convergence();
         test_objectives_and_finite_differences();
+        test_second_order_methods();
     } catch (const std::exception& e) {
         std::cerr << "[ERROR] Unhandled exception in unit test: " << e.what() << std::endl;
         return 1;
     }
 
     std::cout << "====================================================" << std::endl;
-    std::cout << " All Track A Optimizer & Objective Tests Passed (100% OK)." << std::endl;
+    std::cout << " All Track A Optimizer, Objective & Second-Order Tests Passed (100% OK)." << std::endl;
     std::cout << "====================================================" << std::endl;
     return 0;
 }
