@@ -19,20 +19,20 @@ All methods explicitly covered in Chapter 6 are tracked below:
 
 | Area | Algorithm / Technique | Experiment Description | Code Location | Result Summary |
 | :--- | :--- | :--- | :--- | :--- |
-| **ML Foundations** | ML as Optimization (Loss, Regularization) | Small linear/logistic regression setup | `A_continuous/` | Pending |
-| **ML Foundations** | Continuous vs Discrete Optimization | Landscape comparison | `A_continuous/`, `B_discrete/` | Pending |
-| **ML Foundations** | Convex vs Non-Convex (Local Min / Saddle) | 2D benchmark functions (e.g. Rastrigin/Saddle) | `A_continuous/` | Pending |
+| **ML Foundations** | ML as Optimization (Loss, Regularization) | 2-layer MLP loss minimization on XOR dataset | `A_continuous/src/neural_net.hpp` | Completed (Loss reduced by 98.6% - 100.0%) |
+| **ML Foundations** | Continuous vs Discrete Optimization | Landscape comparison & continuous testbed | `A_continuous/src/objectives.hpp` | Completed (6 benchmark topologies evaluated) |
+| **ML Foundations** | Convex vs Non-Convex (Local Min / Saddle) | Quadratic vs Rosenbrock vs Saddle ($x^2-y^2$) vs Rastrigin | `A_continuous/src/objectives.hpp` | Completed (Documented in `report/A_continuous.md`) |
 | **ML Foundations** | Basic Quantum Concepts in QML | Parameterized rotation / State encoding | `C_quantum/`, `I_quantum_algorithms/` | Pending |
-| **Continuous** | Gradient Descent (GD) | Convex quadratic & logistic loss | `A_continuous/` | Pending |
-| **Continuous** | SGD & Mini-batch SGD | Noisy gradient step comparison | `A_continuous/` | Pending |
-| **Continuous** | Momentum & NAG (Nesterov) | Ill-conditioned quadratic ravine | `A_continuous/` | Pending |
-| **Continuous** | AdaGrad, RMSProp, Adam | Sparse & non-convex optimization | `A_continuous/` | Pending |
-| **Continuous** | Newton & Gauss-Newton | Exact Hessian & nonlinear least squares | `A_continuous/` | Pending |
-| **Continuous** | Backpropagation | Gradient computation engine | `A_continuous/` | Pending |
-| **Continuous** | Curvature Approximations (Fisher, HVPs) | Hessian-vector product & diagonal Fisher | `A_continuous/` | Pending |
-| **Continuous** | Convergence (Convex vs Non-Convex) | Rate comparison across condition numbers | `A_continuous/` | Pending |
-| **Continuous** | Step-size & Optimizer Tuning | Learning rate sweeps & schedule sensitivity | `A_continuous/` | Pending |
-| **Continuous** | Noisy Objectives | Optimization under stochastic noise | `A_continuous/` | Pending |
+| **Continuous** | Gradient Descent (GD) | Convex quadratic benchmark | `A_continuous/src/optimizers.hpp` | Completed (Exact single-step solve at $\eta=0.5$) |
+| **Continuous** | SGD & Mini-batch SGD | Noisy gradient step comparison ($B=4$) | `A_continuous/src/optimizers.hpp` | Completed (Robust on convex & neural net) |
+| **Continuous** | Momentum & NAG (Nesterov) | Ill-conditioned quadratic ravine ($\kappa=100$) | `A_continuous/src/optimizers.hpp` | Completed (Converged in $< 100$ iters vs GD $> 500$) |
+| **Continuous** | AdaGrad, RMSProp, Adam | Sparse & non-convex Rosenbrock valley | `A_continuous/src/optimizers.hpp` | Completed (Adam achieved $f=0.0000$ in 142 iters) |
+| **Continuous** | Newton & Gauss-Newton | Exact Hessian & nonlinear least squares | `A_continuous/src/second_order.hpp` | Completed (Newton 1-step solve; GN SSE $< 10^{-12}$) |
+| **Continuous** | Backpropagation | Reverse-mode chain rule gradient engine | `A_continuous/src/neural_net.hpp` | Completed (Verified vs finite diffs $< 10^{-5}$) |
+| **Continuous** | Curvature Approximations (Fisher, HVPs) | Central diff HVP, diagonal Fisher, L-BFGS | `A_continuous/src/second_order.hpp` | Completed (HVP error $< 10^{-3}$; L-BFGS $H y = s$) |
+| **Continuous** | Convergence (Convex vs Non-Convex) | Rate comparison across condition numbers | `A_continuous/src/main.cpp` | Completed (Logged to `results/lr_sensitivity.csv`) |
+| **Continuous** | Step-size & Optimizer Tuning | Grid search over $\eta \in [10^{-4}, 0.5]$ | `A_continuous/src/main.cpp` | Completed (Best LR mapped for all 8 optimizers) |
+| **Continuous** | Noisy Objectives | Additive Gaussian noise ($\sigma=0.05$, 10 seeds) | `A_continuous/src/main.cpp` | Completed (Empirical Mean $\pm$ Std logged) |
 | **Discrete** | Greedy Methods | Knapsack / Set cover heuristic | `B_discrete/` | Pending |
 | **Discrete** | Integer Linear Programming (ILP) | Exact integer programming solver / Branching | `B_discrete/` | Pending |
 | **Discrete** | Branch-and-Bound | Exact discrete search with bounding | `B_discrete/` | Pending |

@@ -1,0 +1,481 @@
+Objective,Optimizer,Seed,Final_Loss,Iterations,Runtime_us
+ConvexQuadratic,GradientDescent,101,0.0011895,500,1191
+ConvexQuadratic,GradientDescent,102,0.000588864,500,567
+ConvexQuadratic,GradientDescent,103,8.17375e-005,500,554
+ConvexQuadratic,GradientDescent,104,0.000705406,500,560
+ConvexQuadratic,GradientDescent,105,0.0024077,500,563
+ConvexQuadratic,GradientDescent,106,0.00134406,500,567
+ConvexQuadratic,GradientDescent,107,0.00108802,500,0
+ConvexQuadratic,GradientDescent,108,0.000532565,500,1038
+ConvexQuadratic,GradientDescent,109,0.00096566,500,0
+ConvexQuadratic,GradientDescent,110,0.00019677,500,1000
+ConvexQuadratic,SGD,101,0.0011895,500,645
+ConvexQuadratic,SGD,102,0.000588864,500,479
+ConvexQuadratic,SGD,103,8.17375e-005,500,616
+ConvexQuadratic,SGD,104,0.000705406,500,547
+ConvexQuadratic,SGD,105,0.0024077,500,0
+ConvexQuadratic,SGD,106,0.00134406,500,557
+ConvexQuadratic,SGD,107,0.00108802,500,566
+ConvexQuadratic,SGD,108,0.000532565,500,612
+ConvexQuadratic,SGD,109,0.00096566,500,581
+ConvexQuadratic,SGD,110,0.00019677,500,563
+ConvexQuadratic,MiniBatchSGD,101,0.0011895,500,539
+ConvexQuadratic,MiniBatchSGD,102,0.000588864,500,537
+ConvexQuadratic,MiniBatchSGD,103,8.17375e-005,500,518
+ConvexQuadratic,MiniBatchSGD,104,0.000705406,500,522
+ConvexQuadratic,MiniBatchSGD,105,0.0024077,500,545
+ConvexQuadratic,MiniBatchSGD,106,0.00134406,500,537
+ConvexQuadratic,MiniBatchSGD,107,0.00108802,500,540
+ConvexQuadratic,MiniBatchSGD,108,0.000532565,500,0
+ConvexQuadratic,MiniBatchSGD,109,0.00096566,500,541
+ConvexQuadratic,MiniBatchSGD,110,0.00019677,500,541
+ConvexQuadratic,Momentum,101,3.53755e-005,500,0
+ConvexQuadratic,Momentum,102,0.000112552,500,0
+ConvexQuadratic,Momentum,103,1.42504e-005,500,0
+ConvexQuadratic,Momentum,104,9.11747e-005,500,0
+ConvexQuadratic,Momentum,105,2.21607e-005,500,0
+ConvexQuadratic,Momentum,106,0.000191633,500,0
+ConvexQuadratic,Momentum,107,1.29842e-005,500,0
+ConvexQuadratic,Momentum,108,2.36439e-005,500,0
+ConvexQuadratic,Momentum,109,0.000139361,500,0
+ConvexQuadratic,Momentum,110,2.51684e-006,500,0
+ConvexQuadratic,NAG,101,0.00069443,500,532
+ConvexQuadratic,NAG,102,0.00101686,500,514
+ConvexQuadratic,NAG,103,6.50061e-005,500,529
+ConvexQuadratic,NAG,104,0.000270481,500,542
+ConvexQuadratic,NAG,105,0.000529582,500,538
+ConvexQuadratic,NAG,106,0.0002519,500,533
+ConvexQuadratic,NAG,107,0.000347844,500,533
+ConvexQuadratic,NAG,108,5.05491e-005,500,534
+ConvexQuadratic,NAG,109,0.000186768,500,514
+ConvexQuadratic,NAG,110,0.000172221,500,535
+ConvexQuadratic,AdaGrad,101,6.41035e-005,500,615
+ConvexQuadratic,AdaGrad,102,0.000195918,500,583
+ConvexQuadratic,AdaGrad,103,2.30644e-005,500,559
+ConvexQuadratic,AdaGrad,104,9.28447e-005,500,553
+ConvexQuadratic,AdaGrad,105,6.13713e-005,500,552
+ConvexQuadratic,AdaGrad,106,0.000139834,500,547
+ConvexQuadratic,AdaGrad,107,1.20768e-005,500,552
+ConvexQuadratic,AdaGrad,108,1.77215e-005,500,548
+ConvexQuadratic,AdaGrad,109,0.000122784,500,547
+ConvexQuadratic,AdaGrad,110,1.49716e-005,500,548
+ConvexQuadratic,RMSProp,101,0.0768878,500,1009
+ConvexQuadratic,RMSProp,102,0.0646611,500,0
+ConvexQuadratic,RMSProp,103,0.114675,500,1109
+ConvexQuadratic,RMSProp,104,0.0500688,500,0
+ConvexQuadratic,RMSProp,105,0.019073,500,998
+ConvexQuadratic,RMSProp,106,0.0821508,500,0
+ConvexQuadratic,RMSProp,107,0.0627578,500,999
+ConvexQuadratic,RMSProp,108,0.0839563,500,1000
+ConvexQuadratic,RMSProp,109,0.0863421,500,0
+ConvexQuadratic,RMSProp,110,0.23743,500,1000
+ConvexQuadratic,Adam,101,0.00160113,500,1225
+ConvexQuadratic,Adam,102,0.00188008,500,535
+ConvexQuadratic,Adam,103,9.12114e-005,500,533
+ConvexQuadratic,Adam,104,0.000665643,500,535
+ConvexQuadratic,Adam,105,0.000976654,500,533
+ConvexQuadratic,Adam,106,8.89287e-005,500,1040
+ConvexQuadratic,Adam,107,0.0013006,500,514
+ConvexQuadratic,Adam,108,7.3012e-006,500,1053
+ConvexQuadratic,Adam,109,2.92266e-005,500,467
+ConvexQuadratic,Adam,110,0.000454811,500,1044
+StronglyConvexQuadratic (kappa=100),GradientDescent,101,0.000195733,500,511
+StronglyConvexQuadratic (kappa=100),GradientDescent,102,0.000304712,500,503
+StronglyConvexQuadratic (kappa=100),GradientDescent,103,0.000183722,500,563
+StronglyConvexQuadratic (kappa=100),GradientDescent,104,0.000272307,500,333
+StronglyConvexQuadratic (kappa=100),GradientDescent,105,0.000215463,500,548
+StronglyConvexQuadratic (kappa=100),GradientDescent,106,0.000204584,500,544
+StronglyConvexQuadratic (kappa=100),GradientDescent,107,0.000152317,500,538
+StronglyConvexQuadratic (kappa=100),GradientDescent,108,0.000228801,500,521
+StronglyConvexQuadratic (kappa=100),GradientDescent,109,0.000305487,500,0
+StronglyConvexQuadratic (kappa=100),GradientDescent,110,0.000199645,500,1005
+StronglyConvexQuadratic (kappa=100),SGD,101,0.000195733,500,540
+StronglyConvexQuadratic (kappa=100),SGD,102,0.000304712,500,540
+StronglyConvexQuadratic (kappa=100),SGD,103,0.000183722,500,538
+StronglyConvexQuadratic (kappa=100),SGD,104,0.000272307,500,543
+StronglyConvexQuadratic (kappa=100),SGD,105,0.000215463,500,559
+StronglyConvexQuadratic (kappa=100),SGD,106,0.000204584,500,541
+StronglyConvexQuadratic (kappa=100),SGD,107,0.000152317,500,539
+StronglyConvexQuadratic (kappa=100),SGD,108,0.000228801,500,541
+StronglyConvexQuadratic (kappa=100),SGD,109,0.000305487,500,540
+StronglyConvexQuadratic (kappa=100),SGD,110,0.000199645,500,783
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,101,0.000195733,500,557
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,102,0.000304712,500,541
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,103,0.000183722,500,527
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,104,0.000272307,500,557
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,105,0.000215463,500,546
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,106,0.000204584,500,556
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,107,0.000152317,500,547
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,108,0.000228801,500,551
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,109,0.000305487,500,0
+StronglyConvexQuadratic (kappa=100),MiniBatchSGD,110,0.000199645,500,1007
+StronglyConvexQuadratic (kappa=100),Momentum,101,0.000109829,500,556
+StronglyConvexQuadratic (kappa=100),Momentum,102,0.000134689,500,551
+StronglyConvexQuadratic (kappa=100),Momentum,103,0.00019714,500,541
+StronglyConvexQuadratic (kappa=100),Momentum,104,9.51628e-005,500,539
+StronglyConvexQuadratic (kappa=100),Momentum,105,1.43818e-005,500,540
+StronglyConvexQuadratic (kappa=100),Momentum,106,0.000191164,500,539
+StronglyConvexQuadratic (kappa=100),Momentum,107,1.79775e-005,500,540
+StronglyConvexQuadratic (kappa=100),Momentum,108,0.000345313,500,554
+StronglyConvexQuadratic (kappa=100),Momentum,109,1.16867e-005,500,555
+StronglyConvexQuadratic (kappa=100),Momentum,110,9.55508e-005,500,587
+StronglyConvexQuadratic (kappa=100),NAG,101,0.000102384,500,545
+StronglyConvexQuadratic (kappa=100),NAG,102,0.000198823,500,544
+StronglyConvexQuadratic (kappa=100),NAG,103,5.91666e-005,500,549
+StronglyConvexQuadratic (kappa=100),NAG,104,5.30362e-005,500,549
+StronglyConvexQuadratic (kappa=100),NAG,105,0.000341058,500,544
+StronglyConvexQuadratic (kappa=100),NAG,106,0.000656381,500,545
+StronglyConvexQuadratic (kappa=100),NAG,107,4.69455e-005,500,527
+StronglyConvexQuadratic (kappa=100),NAG,108,1.59148e-005,500,532
+StronglyConvexQuadratic (kappa=100),NAG,109,5.4297e-005,500,556
+StronglyConvexQuadratic (kappa=100),NAG,110,7.18168e-006,500,545
+StronglyConvexQuadratic (kappa=100),AdaGrad,101,1.46452e-005,500,0
+StronglyConvexQuadratic (kappa=100),AdaGrad,102,0.000150486,500,0
+StronglyConvexQuadratic (kappa=100),AdaGrad,103,1.05083e-005,500,0
+StronglyConvexQuadratic (kappa=100),AdaGrad,104,1.06963e-005,500,0
+StronglyConvexQuadratic (kappa=100),AdaGrad,105,2.24317e-005,500,0
+StronglyConvexQuadratic (kappa=100),AdaGrad,106,0.000139206,500,0
+StronglyConvexQuadratic (kappa=100),AdaGrad,107,9.06996e-006,500,0
+StronglyConvexQuadratic (kappa=100),AdaGrad,108,1.76845e-005,500,0
+StronglyConvexQuadratic (kappa=100),AdaGrad,109,3.51398e-005,500,0
+StronglyConvexQuadratic (kappa=100),AdaGrad,110,1.4679e-005,500,0
+StronglyConvexQuadratic (kappa=100),RMSProp,101,3.18622,500,545
+StronglyConvexQuadratic (kappa=100),RMSProp,102,3.11868,500,536
+StronglyConvexQuadratic (kappa=100),RMSProp,103,3.27648,500,534
+StronglyConvexQuadratic (kappa=100),RMSProp,104,3.10546,500,534
+StronglyConvexQuadratic (kappa=100),RMSProp,105,3.06644,500,532
+StronglyConvexQuadratic (kappa=100),RMSProp,106,3.12147,500,700
+StronglyConvexQuadratic (kappa=100),RMSProp,107,3.23688,500,1286
+StronglyConvexQuadratic (kappa=100),RMSProp,108,3.12765,500,429
+StronglyConvexQuadratic (kappa=100),RMSProp,109,3.17814,500,712
+StronglyConvexQuadratic (kappa=100),RMSProp,110,3.09452,500,0
+StronglyConvexQuadratic (kappa=100),Adam,101,0.0032439,500,783
+StronglyConvexQuadratic (kappa=100),Adam,102,0.000139577,500,1112
+StronglyConvexQuadratic (kappa=100),Adam,103,0.000465577,500,374
+StronglyConvexQuadratic (kappa=100),Adam,104,0.000262701,500,544
+StronglyConvexQuadratic (kappa=100),Adam,105,0.000337481,500,550
+StronglyConvexQuadratic (kappa=100),Adam,106,0.00216221,500,547
+StronglyConvexQuadratic (kappa=100),Adam,107,8.57469e-005,500,545
+StronglyConvexQuadratic (kappa=100),Adam,108,0.0010984,500,0
+StronglyConvexQuadratic (kappa=100),Adam,109,0.000507607,500,1034
+StronglyConvexQuadratic (kappa=100),Adam,110,0.00130411,500,0
+Rosenbrock,GradientDescent,101,1.26089,500,533
+Rosenbrock,GradientDescent,102,0.564013,500,535
+Rosenbrock,GradientDescent,103,0.528261,500,534
+Rosenbrock,GradientDescent,104,0.643804,500,533
+Rosenbrock,GradientDescent,105,1.02527,500,531
+Rosenbrock,GradientDescent,106,0.511687,500,532
+Rosenbrock,GradientDescent,107,0.48947,500,547
+Rosenbrock,GradientDescent,108,0.752741,500,532
+Rosenbrock,GradientDescent,109,0.467822,500,529
+Rosenbrock,GradientDescent,110,0.879503,500,532
+Rosenbrock,SGD,101,1.26089,500,529
+Rosenbrock,SGD,102,0.564013,500,531
+Rosenbrock,SGD,103,0.528261,500,544
+Rosenbrock,SGD,104,0.643804,500,553
+Rosenbrock,SGD,105,1.02527,500,549
+Rosenbrock,SGD,106,0.511687,500,547
+Rosenbrock,SGD,107,0.48947,500,747
+Rosenbrock,SGD,108,0.752741,500,543
+Rosenbrock,SGD,109,0.467822,500,553
+Rosenbrock,SGD,110,0.879503,500,548
+Rosenbrock,MiniBatchSGD,101,1.26089,500,0
+Rosenbrock,MiniBatchSGD,102,0.564013,500,0
+Rosenbrock,MiniBatchSGD,103,0.528261,500,0
+Rosenbrock,MiniBatchSGD,104,0.643804,500,0
+Rosenbrock,MiniBatchSGD,105,1.02527,500,0
+Rosenbrock,MiniBatchSGD,106,0.511687,500,0
+Rosenbrock,MiniBatchSGD,107,0.48947,500,0
+Rosenbrock,MiniBatchSGD,108,0.752741,500,0
+Rosenbrock,MiniBatchSGD,109,0.467822,500,0
+Rosenbrock,MiniBatchSGD,110,0.879503,500,0
+Rosenbrock,Momentum,101,0.00177927,500,0
+Rosenbrock,Momentum,102,0.00185581,500,0
+Rosenbrock,Momentum,103,0.00193897,500,0
+Rosenbrock,Momentum,104,0.00153153,500,0
+Rosenbrock,Momentum,105,0.00182479,500,0
+Rosenbrock,Momentum,106,0.00188088,500,0
+Rosenbrock,Momentum,107,0.00202216,500,0
+Rosenbrock,Momentum,108,0.00179262,500,0
+Rosenbrock,Momentum,109,0.00179481,500,0
+Rosenbrock,Momentum,110,0.00200487,500,0
+Rosenbrock,NAG,101,0.00246152,500,6178
+Rosenbrock,NAG,102,0.00253291,500,0
+Rosenbrock,NAG,103,0.00265084,500,0
+Rosenbrock,NAG,104,0.00216278,500,0
+Rosenbrock,NAG,105,0.00251253,500,0
+Rosenbrock,NAG,106,0.00256104,500,0
+Rosenbrock,NAG,107,0.00270949,500,0
+Rosenbrock,NAG,108,0.0024497,500,0
+Rosenbrock,NAG,109,0.00248983,500,0
+Rosenbrock,NAG,110,0.00272163,500,0
+Rosenbrock,AdaGrad,101,0.781424,500,556
+Rosenbrock,AdaGrad,102,0.776404,500,534
+Rosenbrock,AdaGrad,103,0.779813,500,537
+Rosenbrock,AdaGrad,104,0.77681,500,537
+Rosenbrock,AdaGrad,105,0.782811,500,531
+Rosenbrock,AdaGrad,106,0.779147,500,565
+Rosenbrock,AdaGrad,107,0.779291,500,1095
+Rosenbrock,AdaGrad,108,0.77712,500,0
+Rosenbrock,AdaGrad,109,0.779821,500,0
+Rosenbrock,AdaGrad,110,0.779747,500,0
+Rosenbrock,RMSProp,101,0.110964,500,532
+Rosenbrock,RMSProp,102,0.109056,500,531
+Rosenbrock,RMSProp,103,0.111285,500,532
+Rosenbrock,RMSProp,104,0.110138,500,532
+Rosenbrock,RMSProp,105,0.109533,500,532
+Rosenbrock,RMSProp,106,0.108332,500,532
+Rosenbrock,RMSProp,107,0.108942,500,534
+Rosenbrock,RMSProp,108,0.109312,500,0
+Rosenbrock,RMSProp,109,0.113886,500,1007
+Rosenbrock,RMSProp,110,0.111024,500,0
+Rosenbrock,Adam,101,5.58946e-005,500,2004
+Rosenbrock,Adam,102,1.93038e-005,500,0
+Rosenbrock,Adam,103,2.8904e-005,500,0
+Rosenbrock,Adam,104,7.00243e-005,500,2002
+Rosenbrock,Adam,105,4.42377e-005,500,0
+Rosenbrock,Adam,106,7.6725e-005,500,0
+Rosenbrock,Adam,107,7.36758e-005,500,2004
+Rosenbrock,Adam,108,6.79065e-006,500,0
+Rosenbrock,Adam,109,0.000267884,500,0
+Rosenbrock,Adam,110,7.86641e-005,500,2003
+SaddlePoint (x^2 - y^2),GradientDescent,101,-2.18671e+298,500,534
+SaddlePoint (x^2 - y^2),GradientDescent,102,-1.05428e+299,500,532
+SaddlePoint (x^2 - y^2),GradientDescent,103,-4.40709e+298,500,529
+SaddlePoint (x^2 - y^2),GradientDescent,104,-3.60591e+298,500,537
+SaddlePoint (x^2 - y^2),GradientDescent,105,-2.43132e+298,500,529
+SaddlePoint (x^2 - y^2),GradientDescent,106,-7.70996e+297,500,534
+SaddlePoint (x^2 - y^2),GradientDescent,107,-1.70017e+298,500,510
+SaddlePoint (x^2 - y^2),GradientDescent,108,-1.52914e+298,500,514
+SaddlePoint (x^2 - y^2),GradientDescent,109,-7.24348e+297,500,0
+SaddlePoint (x^2 - y^2),GradientDescent,110,-2.00316e+298,500,0
+SaddlePoint (x^2 - y^2),SGD,101,-2.18671e+298,500,532
+SaddlePoint (x^2 - y^2),SGD,102,-1.05428e+299,500,533
+SaddlePoint (x^2 - y^2),SGD,103,-4.40709e+298,500,533
+SaddlePoint (x^2 - y^2),SGD,104,-3.60591e+298,500,532
+SaddlePoint (x^2 - y^2),SGD,105,-2.43132e+298,500,533
+SaddlePoint (x^2 - y^2),SGD,106,-7.70996e+297,500,533
+SaddlePoint (x^2 - y^2),SGD,107,-1.70017e+298,500,533
+SaddlePoint (x^2 - y^2),SGD,108,-1.52914e+298,500,517
+SaddlePoint (x^2 - y^2),SGD,109,-7.24348e+297,500,0
+SaddlePoint (x^2 - y^2),SGD,110,-2.00316e+298,500,0
+SaddlePoint (x^2 - y^2),MiniBatchSGD,101,-2.18671e+298,500,1779
+SaddlePoint (x^2 - y^2),MiniBatchSGD,102,-1.05428e+299,500,1175
+SaddlePoint (x^2 - y^2),MiniBatchSGD,103,-4.40709e+298,500,998
+SaddlePoint (x^2 - y^2),MiniBatchSGD,104,-3.60591e+298,500,0
+SaddlePoint (x^2 - y^2),MiniBatchSGD,105,-2.43132e+298,500,1002
+SaddlePoint (x^2 - y^2),MiniBatchSGD,106,-7.70996e+297,500,0
+SaddlePoint (x^2 - y^2),MiniBatchSGD,107,-1.70017e+298,500,998
+SaddlePoint (x^2 - y^2),MiniBatchSGD,108,-1.52914e+298,500,0
+SaddlePoint (x^2 - y^2),MiniBatchSGD,109,-7.24348e+297,500,997
+SaddlePoint (x^2 - y^2),MiniBatchSGD,110,-2.00316e+298,500,0
+SaddlePoint (x^2 - y^2),Momentum,101,-4.47077e+283,500,573
+SaddlePoint (x^2 - y^2),Momentum,102,-2.13902e+284,500,571
+SaddlePoint (x^2 - y^2),Momentum,103,-9.06431e+283,500,578
+SaddlePoint (x^2 - y^2),Momentum,104,-7.31343e+283,500,801
+SaddlePoint (x^2 - y^2),Momentum,105,-4.8915e+283,500,532
+SaddlePoint (x^2 - y^2),Momentum,106,-1.66903e+283,500,803
+SaddlePoint (x^2 - y^2),Momentum,107,-3.44426e+283,500,549
+SaddlePoint (x^2 - y^2),Momentum,108,-3.20275e+283,500,0
+SaddlePoint (x^2 - y^2),Momentum,109,-1.6355e+283,500,1022
+SaddlePoint (x^2 - y^2),Momentum,110,-4.19959e+283,500,0
+SaddlePoint (x^2 - y^2),NAG,101,-3.25222e+203,500,583
+SaddlePoint (x^2 - y^2),NAG,102,-1.44832e+204,500,572
+SaddlePoint (x^2 - y^2),NAG,103,-6.7579e+203,500,534
+SaddlePoint (x^2 - y^2),NAG,104,-5.04773e+203,500,553
+SaddlePoint (x^2 - y^2),NAG,105,-3.26171e+203,500,583
+SaddlePoint (x^2 - y^2),NAG,106,-1.64933e+203,500,569
+SaddlePoint (x^2 - y^2),NAG,107,-2.38876e+203,500,0
+SaddlePoint (x^2 - y^2),NAG,108,-2.65951e+203,500,1020
+SaddlePoint (x^2 - y^2),NAG,109,-2.01489e+203,500,0
+SaddlePoint (x^2 - y^2),NAG,110,-3.53847e+203,500,996
+SaddlePoint (x^2 - y^2),AdaGrad,101,-979.95,500,562
+SaddlePoint (x^2 - y^2),AdaGrad,102,-978.649,500,560
+SaddlePoint (x^2 - y^2),AdaGrad,103,-979.168,500,561
+SaddlePoint (x^2 - y^2),AdaGrad,104,-979.464,500,568
+SaddlePoint (x^2 - y^2),AdaGrad,105,-980.119,500,578
+SaddlePoint (x^2 - y^2),AdaGrad,106,-979.596,500,566
+SaddlePoint (x^2 - y^2),AdaGrad,107,-980.073,500,0
+SaddlePoint (x^2 - y^2),AdaGrad,108,-979.814,500,0
+SaddlePoint (x^2 - y^2),AdaGrad,109,-979.735,500,0
+SaddlePoint (x^2 - y^2),AdaGrad,110,-979.204,500,2014
+SaddlePoint (x^2 - y^2),RMSProp,101,-73954,500,539
+SaddlePoint (x^2 - y^2),RMSProp,102,-73940.4,500,540
+SaddlePoint (x^2 - y^2),RMSProp,103,-73947.4,500,552
+SaddlePoint (x^2 - y^2),RMSProp,104,-73949.9,500,0
+SaddlePoint (x^2 - y^2),RMSProp,105,-73955.7,500,0
+SaddlePoint (x^2 - y^2),RMSProp,106,-73951.6,500,0
+SaddlePoint (x^2 - y^2),RMSProp,107,-73955.6,500,2003
+SaddlePoint (x^2 - y^2),RMSProp,108,-73952.4,500,0
+SaddlePoint (x^2 - y^2),RMSProp,109,-73935.8,500,0
+SaddlePoint (x^2 - y^2),RMSProp,110,-73948.3,500,2005
+SaddlePoint (x^2 - y^2),Adam,101,-159234,500,541
+SaddlePoint (x^2 - y^2),Adam,102,-159234,500,541
+SaddlePoint (x^2 - y^2),Adam,103,-159232,500,0
+SaddlePoint (x^2 - y^2),Adam,104,-159232,500,0
+SaddlePoint (x^2 - y^2),Adam,105,-159235,500,2007
+SaddlePoint (x^2 - y^2),Adam,106,-159234,500,0
+SaddlePoint (x^2 - y^2),Adam,107,-159234,500,0
+SaddlePoint (x^2 - y^2),Adam,108,-159237,500,2005
+SaddlePoint (x^2 - y^2),Adam,109,-159242,500,0
+SaddlePoint (x^2 - y^2),Adam,110,-159233,500,0
+Rastrigin,GradientDescent,101,309.675,500,1112
+Rastrigin,GradientDescent,102,1854.15,500,566
+Rastrigin,GradientDescent,103,1020.96,500,1100
+Rastrigin,GradientDescent,104,850.015,500,549
+Rastrigin,GradientDescent,105,1623.5,500,1110
+Rastrigin,GradientDescent,106,1962.76,500,552
+Rastrigin,GradientDescent,107,774.859,500,1101
+Rastrigin,GradientDescent,108,1222.89,500,552
+Rastrigin,GradientDescent,109,1806.2,500,576
+Rastrigin,GradientDescent,110,1507.95,500,0
+Rastrigin,SGD,101,309.675,500,1183
+Rastrigin,SGD,102,1854.15,500,539
+Rastrigin,SGD,103,1020.96,500,570
+Rastrigin,SGD,104,850.015,500,566
+Rastrigin,SGD,105,1623.5,500,584
+Rastrigin,SGD,106,1962.76,500,555
+Rastrigin,SGD,107,774.859,500,560
+Rastrigin,SGD,108,1222.89,500,559
+Rastrigin,SGD,109,1806.2,500,562
+Rastrigin,SGD,110,1507.95,500,559
+Rastrigin,MiniBatchSGD,101,309.675,500,561
+Rastrigin,MiniBatchSGD,102,1854.15,500,548
+Rastrigin,MiniBatchSGD,103,1020.96,500,1207
+Rastrigin,MiniBatchSGD,104,850.015,500,562
+Rastrigin,MiniBatchSGD,105,1623.5,500,559
+Rastrigin,MiniBatchSGD,106,1962.76,500,559
+Rastrigin,MiniBatchSGD,107,774.859,500,562
+Rastrigin,MiniBatchSGD,108,1222.89,500,560
+Rastrigin,MiniBatchSGD,109,1806.2,500,558
+Rastrigin,MiniBatchSGD,110,1507.95,500,1120
+Rastrigin,Momentum,101,9429.53,500,1270
+Rastrigin,Momentum,102,12027.9,500,0
+Rastrigin,Momentum,103,1042.77,500,999
+Rastrigin,Momentum,104,12315,500,1000
+Rastrigin,Momentum,105,15263,500,450
+Rastrigin,Momentum,106,12857.8,500,0
+Rastrigin,Momentum,107,13584.4,500,1136
+Rastrigin,Momentum,108,1747.72,500,979
+Rastrigin,Momentum,109,537.997,500,0
+Rastrigin,Momentum,110,6956.89,500,1020
+Rastrigin,NAG,101,7.95968,500,535
+Rastrigin,NAG,102,7.95967,500,534
+Rastrigin,NAG,103,7.95967,500,1073
+Rastrigin,NAG,104,7.95967,500,539
+Rastrigin,NAG,105,7.95967,500,538
+Rastrigin,NAG,106,7.95967,500,538
+Rastrigin,NAG,107,7.95967,500,528
+Rastrigin,NAG,108,7.95968,500,1084
+Rastrigin,NAG,109,7.95967,500,535
+Rastrigin,NAG,110,7.95966,500,534
+Rastrigin,AdaGrad,101,7.9597,500,1597
+Rastrigin,AdaGrad,102,7.95969,500,0
+Rastrigin,AdaGrad,103,7.9597,500,0
+Rastrigin,AdaGrad,104,7.95968,500,2517
+Rastrigin,AdaGrad,105,7.9597,500,0
+Rastrigin,AdaGrad,106,7.95968,500,0
+Rastrigin,AdaGrad,107,7.95971,500,0
+Rastrigin,AdaGrad,108,7.95967,500,0
+Rastrigin,AdaGrad,109,7.95967,500,2012
+Rastrigin,AdaGrad,110,7.95967,500,0
+Rastrigin,RMSProp,101,8.20025,500,526
+Rastrigin,RMSProp,102,8.20771,500,1057
+Rastrigin,RMSProp,103,8.2073,500,542
+Rastrigin,RMSProp,104,8.21263,500,541
+Rastrigin,RMSProp,105,8.21127,500,1103
+Rastrigin,RMSProp,106,8.19605,500,533
+Rastrigin,RMSProp,107,8.21175,500,524
+Rastrigin,RMSProp,108,8.21136,500,653
+Rastrigin,RMSProp,109,8.20206,500,872
+Rastrigin,RMSProp,110,8.20898,500,0
+Rastrigin,Adam,101,1.99003,500,1093
+Rastrigin,Adam,102,1.99,500,589
+Rastrigin,Adam,103,1.9909,500,572
+Rastrigin,Adam,104,1.98993,500,1133
+Rastrigin,Adam,105,1.99036,500,0
+Rastrigin,Adam,106,1.98998,500,1405
+Rastrigin,Adam,107,1.99061,500,1090
+Rastrigin,Adam,108,1.98999,500,1005
+Rastrigin,Adam,109,1.99016,500,0
+Rastrigin,Adam,110,1.99025,500,1001
+Himmelblau,GradientDescent,101,4.3287e-005,500,540
+Himmelblau,GradientDescent,102,6.7015e-005,500,577
+Himmelblau,GradientDescent,103,6.25825e-005,500,568
+Himmelblau,GradientDescent,104,4.05919e-005,500,570
+Himmelblau,GradientDescent,105,3.16061e-005,500,553
+Himmelblau,GradientDescent,106,3.32582e-005,500,571
+Himmelblau,GradientDescent,107,9.235e-005,500,583
+Himmelblau,GradientDescent,108,9.25654e-006,500,564
+Himmelblau,GradientDescent,109,1.92142e-005,500,564
+Himmelblau,GradientDescent,110,7.824e-006,500,567
+Himmelblau,SGD,101,4.3287e-005,500,0
+Himmelblau,SGD,102,6.7015e-005,500,567
+Himmelblau,SGD,103,6.25825e-005,500,564
+Himmelblau,SGD,104,4.05919e-005,500,563
+Himmelblau,SGD,105,3.16061e-005,500,561
+Himmelblau,SGD,106,3.32582e-005,500,560
+Himmelblau,SGD,107,9.235e-005,500,555
+Himmelblau,SGD,108,9.25654e-006,500,541
+Himmelblau,SGD,109,1.92142e-005,500,589
+Himmelblau,SGD,110,7.824e-006,500,566
+Himmelblau,MiniBatchSGD,101,4.3287e-005,500,549
+Himmelblau,MiniBatchSGD,102,6.7015e-005,500,537
+Himmelblau,MiniBatchSGD,103,6.25825e-005,500,536
+Himmelblau,MiniBatchSGD,104,4.05919e-005,500,543
+Himmelblau,MiniBatchSGD,105,3.16061e-005,500,542
+Himmelblau,MiniBatchSGD,106,3.32582e-005,500,537
+Himmelblau,MiniBatchSGD,107,9.235e-005,500,545
+Himmelblau,MiniBatchSGD,108,9.25654e-006,500,0
+Himmelblau,MiniBatchSGD,109,1.92142e-005,500,0
+Himmelblau,MiniBatchSGD,110,7.824e-006,500,0
+Himmelblau,Momentum,101,0.000260707,500,552
+Himmelblau,Momentum,102,0.000250712,500,551
+Himmelblau,Momentum,103,0.000168954,500,541
+Himmelblau,Momentum,104,9.10819e-005,500,542
+Himmelblau,Momentum,105,3.51988e-005,500,541
+Himmelblau,Momentum,106,0.000706599,500,580
+Himmelblau,Momentum,107,0.000148042,500,540
+Himmelblau,Momentum,108,9.3256e-007,500,562
+Himmelblau,Momentum,109,4.12655e-005,500,541
+Himmelblau,Momentum,110,0.000178776,500,549
+Himmelblau,NAG,101,6.49609e-005,500,0
+Himmelblau,NAG,102,4.18294e-005,500,0
+Himmelblau,NAG,103,2.46294e-005,500,2007
+Himmelblau,NAG,104,7.78909e-006,500,0
+Himmelblau,NAG,105,1.60677e-005,500,0
+Himmelblau,NAG,106,4.63834e-005,500,0
+Himmelblau,NAG,107,5.53595e-005,500,2003
+Himmelblau,NAG,108,3.97004e-005,500,0
+Himmelblau,NAG,109,2.02916e-005,500,0
+Himmelblau,NAG,110,1.56783e-005,500,0
+Himmelblau,AdaGrad,101,1.87976e-005,500,2007
+Himmelblau,AdaGrad,102,8.24828e-006,500,0
+Himmelblau,AdaGrad,103,4.97348e-006,500,0
+Himmelblau,AdaGrad,104,2.142e-005,500,2004
+Himmelblau,AdaGrad,105,7.31756e-005,500,0
+Himmelblau,AdaGrad,106,2.46595e-005,500,0
+Himmelblau,AdaGrad,107,1.46689e-005,500,0
+Himmelblau,AdaGrad,108,8.0066e-007,500,2004
+Himmelblau,AdaGrad,109,2.23848e-005,500,0
+Himmelblau,AdaGrad,110,1.08728e-006,500,0
+Himmelblau,RMSProp,101,0.338576,500,547
+Himmelblau,RMSProp,102,0.327494,500,541
+Himmelblau,RMSProp,103,0.329062,500,543
+Himmelblau,RMSProp,104,0.311741,500,550
+Himmelblau,RMSProp,105,0.318543,500,543
+Himmelblau,RMSProp,106,0.351592,500,544
+Himmelblau,RMSProp,107,0.337714,500,564
+Himmelblau,RMSProp,108,0.326958,500,566
+Himmelblau,RMSProp,109,0.356472,500,545
+Himmelblau,RMSProp,110,0.316419,500,546
+Himmelblau,Adam,101,1.23895e-005,500,547
+Himmelblau,Adam,102,2.14661e-005,500,567
+Himmelblau,Adam,103,4.47504e-007,500,555
+Himmelblau,Adam,104,8.14412e-006,500,1107
+Himmelblau,Adam,105,1.20297e-005,500,551
+Himmelblau,Adam,106,9.53453e-006,500,549
+Himmelblau,Adam,107,1.56431e-005,500,557
+Himmelblau,Adam,108,9.65374e-007,500,558
+Himmelblau,Adam,109,1.24426e-006,500,0
+Himmelblau,Adam,110,2.82345e-006,500,0
