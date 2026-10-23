@@ -1,0 +1,6 @@
+x = 42;
+flag = 0;
+if (x > 30) {
+    flag = 1;
+}
+print(flag);

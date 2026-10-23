@@ -1,0 +1,8 @@
+val = 15;
+result = 0;
+if (val % 2 == 0) {
+    result = 100;
+} else {
+    result = 200;
+}
+print(result);

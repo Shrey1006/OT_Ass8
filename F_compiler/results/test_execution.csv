@@ -1,0 +1,16 @@
+test_id,name,tokens_count,tac_instructions,bytecode_instructions,vm_cycles,passed
+1,p01_arithmetic,29,16,43,43,true
+2,p02_variable_assign,38,13,33,33,true
+3,p03_if_simple,26,11,23,23,true
+4,p04_if_else,35,17,34,29,true
+5,p05_nested_if,48,23,41,32,true
+6,p06_while_countdown,34,16,34,134,true
+7,p07_factorial,34,16,34,157,true
+8,p08_fibonacci,50,21,44,275,true
+9,p09_collatz,76,36,77,5364,true
+10,p10_gcd_euclid,36,15,30,76,true
+11,p11_power_exp,54,26,58,152,true
+12,p12_prime_check,95,46,99,549,true
+13,p13_nested_loops,54,28,59,839,true
+14,p14_boolean_logic,87,36,82,82,true
+15,p15_sum_of_squares,71,32,82,313,true

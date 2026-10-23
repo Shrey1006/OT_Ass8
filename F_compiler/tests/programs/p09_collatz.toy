@@ -1,0 +1,16 @@
+n = 27;
+steps = 0;
+max_val = n;
+while (n != 1) {
+    if (n % 2 == 0) {
+        n = n / 2;
+    } else {
+        n = 3 * n + 1;
+    }
+    if (n > max_val) {
+        max_val = n;
+    }
+    steps = steps + 1;
+}
+print(steps);
+print(max_val);
