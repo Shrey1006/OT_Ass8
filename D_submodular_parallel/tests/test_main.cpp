@@ -6,6 +6,7 @@
 #include <fstream>
 #include "max_coverage.hpp"
 #include "fedavg.hpp"
+#include "multitask.hpp"
 
 void test_input_validation() {
     std::cout << "[TEST] Running input validation tests..." << std::endl;
@@ -238,15 +239,124 @@ void test_fedavg_vs_centralized() {
     std::cout << "  -> FedAvg benchmark completed. Results written to: " << csv_path << "\n";
 }
 
+void test_multitask_optimization() {
+    std::cout << "\n[TEST] Running Track D4: Multi-Task Optimization (Equal Weighting vs. MGDA vs. GradNorm)...\n";
+
+    const size_t n_samples = 500;
+    const size_t dim = 4;
+    const size_t num_seeds = 10;
+    const unsigned int base_seed = 100;
+    const size_t epochs = 100;
+
+    std::string csv_path = "D_submodular_parallel/results/multitask_benchmark.csv";
+    std::ofstream csv(csv_path);
+    if (!csv.is_open()) csv.open("results/multitask_benchmark.csv");
+
+    csv << "method,seed,final_loss1,final_loss2,total_loss,final_cosine_similarity,runtime_ms\n";
+
+    std::vector<std::string> method_names = {"Equal Weighting", "MGDA (Sener-Koltun)", "GradNorm (Chen et al.)"};
+
+    struct SummaryStat {
+        double mean_l1 = 0.0, std_l1 = 0.0;
+        double mean_l2 = 0.0, std_l2 = 0.0;
+        double mean_tot = 0.0, std_tot = 0.0;
+        double mean_cos = 0.0, std_cos = 0.0;
+        double mean_time = 0.0;
+    };
+
+    std::vector<SummaryStat> stats(3);
+
+    std::cout << std::left
+              << std::setw(26) << "Method"
+              << std::setw(6)  << "Seed"
+              << std::setw(14) << "Task 1 Loss"
+              << std::setw(14) << "Task 2 Loss"
+              << std::setw(14) << "Total Loss"
+              << std::setw(16) << "Gradient Cos(th)"
+              << std::setw(14) << "Runtime (ms)"
+              << "\n";
+    std::cout << std::string(104, '-') << "\n";
+
+    for (size_t m_idx = 0; m_idx < 3; ++m_idx) {
+        std::vector<double> l1_list, l2_list, tot_list, cos_list, time_list;
+
+        for (size_t s = 0; s < num_seeds; ++s) {
+            unsigned int seed = base_seed + static_cast<unsigned int>(s);
+            auto data = opt::MultiTaskDataset::generate_conflicting_dataset(n_samples, dim, seed);
+            opt::MultiTaskModel model(dim, 4, seed);
+
+            opt::MultiTaskResult res;
+            if (m_idx == 0) {
+                res = opt::MultiTaskOptimizer::train_equal_weighting(model, data, epochs, 0.04);
+            } else if (m_idx == 1) {
+                res = opt::MultiTaskOptimizer::train_mgda(model, data, epochs, 0.04);
+            } else {
+                res = opt::MultiTaskOptimizer::train_gradnorm(model, data, epochs, 0.04, 0.5, 0.02);
+            }
+
+            l1_list.push_back(res.final_loss1);
+            l2_list.push_back(res.final_loss2);
+            tot_list.push_back(res.total_loss);
+            cos_list.push_back(res.final_cosine_similarity);
+            time_list.push_back(res.runtime_ms);
+
+            csv << "\"" << res.method << "\","
+                << seed << ","
+                << res.final_loss1 << ","
+                << res.final_loss2 << ","
+                << res.total_loss << ","
+                << res.final_cosine_similarity << ","
+                << res.runtime_ms << "\n";
+
+            std::cout << std::left
+                      << std::setw(26) << res.method
+                      << std::setw(6)  << seed
+                      << std::setw(14) << std::fixed << std::setprecision(4) << res.final_loss1
+                      << std::setw(14) << std::fixed << std::setprecision(4) << res.final_loss2
+                      << std::setw(14) << std::fixed << std::setprecision(4) << res.total_loss
+                      << std::setw(16) << std::fixed << std::setprecision(4) << res.final_cosine_similarity
+                      << std::setw(14) << std::fixed << std::setprecision(2) << res.runtime_ms
+                      << "\n";
+        }
+
+        auto calc_mean_std = [](const std::vector<double>& v) {
+            double m = std::accumulate(v.begin(), v.end(), 0.0) / v.size();
+            double sq = 0.0;
+            for (double x : v) sq += (x - m) * (x - m);
+            return std::make_pair(m, std::sqrt(sq / (v.size() - 1)));
+        };
+
+        auto p1 = calc_mean_std(l1_list);
+        auto p2 = calc_mean_std(l2_list);
+        auto pt = calc_mean_std(tot_list);
+        auto pc = calc_mean_std(cos_list);
+        double tm = std::accumulate(time_list.begin(), time_list.end(), 0.0) / time_list.size();
+
+        stats[m_idx] = {p1.first, p1.second, p2.first, p2.second, pt.first, pt.second, pc.first, pc.second, tm};
+
+        std::cout << std::string(104, '-') << "\n";
+        std::cout << "  -> " << method_names[m_idx] << " Mean +/- Std: Task 1 = "
+                  << p1.first << " +/- " << p1.second << " | Task 2 = "
+                  << p2.first << " +/- " << p2.second << " | Total = "
+                  << pt.first << " +/- " << pt.second << " | Cosine Sim = "
+                  << pc.first << " +/- " << pc.second << "\n";
+        std::cout << std::string(104, '-') << "\n";
+    }
+
+    csv.close();
+    std::cout << "  -> Multi-Task benchmark completed. Results written to: " << csv_path << "\n";
+}
+
 int main() {
     std::cout << "========================================================================\n";
-    std::cout << "   Track D: Submodular Maximum Coverage & Federated Optimization        \n";
+    std::cout << "   Track D: Submodular, Parallel, Federated & Multi-Task Optimization   \n";
     std::cout << "========================================================================\n\n";
 
     test_input_validation();
     test_submodularity_property_numerical();
     test_greedy_vs_bruteforce_and_bound();
     test_fedavg_vs_centralized();
+    test_multitask_optimization();
 
     std::cout << "\n[SUCCESS] All Track D tests passed (100% OK).\n";
     return 0;
