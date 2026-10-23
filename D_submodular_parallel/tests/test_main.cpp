@@ -3,7 +3,9 @@
 #include <vector>
 #include <cmath>
 #include <cassert>
+#include <fstream>
 #include "max_coverage.hpp"
+#include "fedavg.hpp"
 
 void test_input_validation() {
     std::cout << "[TEST] Running input validation tests..." << std::endl;
@@ -152,15 +154,100 @@ void test_greedy_vs_bruteforce_and_bound() {
     std::cout << "  -> All test cases strictly satisfy the (1 - 1/e) Nemhauser-Wolsey-Fisher bound.\n";
 }
 
+void test_fedavg_vs_centralized() {
+    std::cout << "\n[TEST] Running Track D3: FedAvg vs. Centralized Logistic Regression (10 Clients)...\n";
+
+    const size_t num_clients = 10;
+    const size_t n_train = 1500;
+    const size_t n_test = 500;
+    const size_t dim = 4;
+    const unsigned int seed = 42;
+
+    auto datasets = opt::Dataset::generate_train_test(n_train, n_test, dim, seed);
+    const auto& train_data = datasets.first;
+    const auto& test_data = datasets.second;
+
+    auto iid_clients = opt::FederatedLearningSystem::partition_data(train_data, num_clients, false, seed);
+    auto non_iid_clients = opt::FederatedLearningSystem::partition_data(train_data, num_clients, true, seed);
+
+    std::string csv_path = "D_submodular_parallel/results/fedavg_benchmark.csv";
+    std::ofstream csv(csv_path);
+    if (!csv.is_open()) csv.open("results/fedavg_benchmark.csv");
+
+    csv << "setting,method,local_steps,comm_rounds,total_gradient_steps,test_loss,test_accuracy,runtime_ms,comm_bytes\n";
+
+    // 1. Centralized Baseline (500 steps)
+    auto res_cent = opt::FederatedLearningSystem::train_centralized(train_data, test_data, 500, 0.15, 0.001);
+    std::cout << "  -> Centralized SGD Baseline (500 steps): Test Loss = " << std::fixed << std::setprecision(4)
+              << res_cent.final_test_loss << " | Accuracy = " << std::fixed << std::setprecision(2)
+              << res_cent.final_test_accuracy << "% | Runtime = " << res_cent.runtime_ms << " ms\n\n";
+
+    csv << "IID,Centralized,500,1,500," << res_cent.final_test_loss << "," << res_cent.final_test_accuracy << ","
+        << res_cent.runtime_ms << ",0\n";
+
+    std::cout << std::left
+              << std::setw(10) << "Data Split"
+              << std::setw(8)  << "Local E"
+              << std::setw(8)  << "Rounds R"
+              << std::setw(12) << "Total Steps"
+              << std::setw(14) << "Test Loss"
+              << std::setw(14) << "Accuracy (%)"
+              << std::setw(14) << "Comm (Bytes)"
+              << std::setw(14) << "Runtime (ms)"
+              << "\n";
+    std::cout << std::string(94, '-') << "\n";
+
+    const std::vector<size_t> local_steps_list = {1, 5, 20};
+    const std::vector<size_t> rounds_list = {5, 10, 25, 50};
+
+    // Evaluate IID and Non-IID settings
+    for (bool non_iid : {false, true}) {
+        std::string split_name = non_iid ? "Non-IID" : "IID";
+        const auto& clients = non_iid ? non_iid_clients : iid_clients;
+
+        for (size_t E : local_steps_list) {
+            for (size_t R : rounds_list) {
+                auto res_fed = opt::FederatedLearningSystem::train_fedavg(clients, test_data, R, E, 0.15, 0.001);
+
+                std::cout << std::left
+                          << std::setw(10) << split_name
+                          << std::setw(8)  << E
+                          << std::setw(8)  << R
+                          << std::setw(12) << res_fed.total_gradient_steps
+                          << std::setw(14) << std::fixed << std::setprecision(4) << res_fed.final_test_loss
+                          << std::setw(14) << std::fixed << std::setprecision(2) << res_fed.final_test_accuracy
+                          << std::setw(14) << res_fed.communication_bytes
+                          << std::setw(14) << std::fixed << std::setprecision(2) << res_fed.runtime_ms
+                          << "\n";
+
+                csv << split_name << ","
+                    << "\"FedAvg\","
+                    << E << ","
+                    << R << ","
+                    << res_fed.total_gradient_steps << ","
+                    << res_fed.final_test_loss << ","
+                    << res_fed.final_test_accuracy << ","
+                    << res_fed.runtime_ms << ","
+                    << res_fed.communication_bytes << "\n";
+            }
+            std::cout << std::string(94, '-') << "\n";
+        }
+    }
+
+    csv.close();
+    std::cout << "  -> FedAvg benchmark completed. Results written to: " << csv_path << "\n";
+}
+
 int main() {
     std::cout << "========================================================================\n";
-    std::cout << "   Track D1: Submodular Maximum Coverage Solver & Theoretical Bound     \n";
+    std::cout << "   Track D: Submodular Maximum Coverage & Federated Optimization        \n";
     std::cout << "========================================================================\n\n";
 
     test_input_validation();
     test_submodularity_property_numerical();
     test_greedy_vs_bruteforce_and_bound();
+    test_fedavg_vs_centralized();
 
-    std::cout << "\n[SUCCESS] All D1 tests passed (100% OK).\n";
+    std::cout << "\n[SUCCESS] All Track D tests passed (100% OK).\n";
     return 0;
 }
