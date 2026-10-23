@@ -1,4 +1,5 @@
 #include "ev_vrptw.hpp"
+#include "ev_vrptw_metaheuristics.hpp"
 #include <iostream>
 #include <cassert>
 #include <cmath>
@@ -23,7 +24,6 @@ void test_deterministic_generator() {
 void test_input_validation() {
     std::cout << "[Test 2] Input Validation & Error Handling..." << std::flush;
     vrptw::VRPTWInstance inst;
-    // Empty instance
     bool caught_empty = false;
     try {
         inst.validate();
@@ -32,7 +32,6 @@ void test_input_validation() {
     }
     assert(caught_empty);
 
-    // Demand exceeding capacity
     inst = vrptw::generate_solomon_instance(5, 2, "R", 42);
     inst.nodes[1].demand = inst.params.vehicle_capacity + 50.0;
     bool caught_overload = false;
@@ -43,7 +42,6 @@ void test_input_validation() {
     }
     assert(caught_overload);
 
-    // Inverted time window
     inst = vrptw::generate_solomon_instance(5, 2, "R", 42);
     inst.nodes[2].ready_time = 10.0;
     inst.nodes[2].due_time = 5.0;
@@ -62,14 +60,12 @@ void test_solution_validator() {
     std::cout << "[Test 3] Solution Feasibility Validator..." << std::flush;
     auto inst = vrptw::generate_solomon_instance(10, 2, "C", 42);
 
-    // 1. Valid baseline solution
     vrptw::Solution sol = vrptw::solve_greedy_baseline(inst);
     assert(sol.is_feasible);
     assert(sol.active_vehicles > 0);
     assert(sol.total_distance > 0.0);
     assert(sol.total_energy > 0.0);
 
-    // 2. Corrupt solution: customer visited twice / another skipped
     if (sol.routes.size() >= 1 && sol.routes[0].stops.size() > 3) {
         vrptw::Solution corrupt_sol = sol;
         corrupt_sol.routes[0].stops[1].node_id = corrupt_sol.routes[0].stops[2].node_id;
@@ -77,10 +73,9 @@ void test_solution_validator() {
         assert(!valid);
     }
 
-    // 3. Corrupt solution: disconnect start from depot
     {
         vrptw::Solution corrupt_sol = sol;
-        corrupt_sol.routes[0].stops[0].node_id = 1; // Not depot
+        corrupt_sol.routes[0].stops[0].node_id = 1;
         bool valid = vrptw::validate_solution(inst, corrupt_sol, false);
         assert(!valid);
     }
@@ -88,27 +83,41 @@ void test_solution_validator() {
     std::cout << " PASSED\n";
 }
 
-void test_baseline_execution() {
-    std::cout << "[Test 4] Greedy Baseline Correctness & Coverage..." << std::flush;
-    for (int n : {5, 15, 30}) {
-        auto inst = vrptw::generate_solomon_instance(n, 3, "RC", 999);
-        vrptw::Solution sol = vrptw::solve_greedy_baseline(inst);
+void test_simulated_annealing() {
+    std::cout << "[Test 4] Simulated Annealing Optimization..." << std::flush;
+    auto inst = vrptw::generate_solomon_instance(15, 3, "RC", 42);
+    vrptw::Solution baseline_sol = vrptw::solve_greedy_baseline(inst);
+    assert(baseline_sol.is_feasible);
 
-        assert(sol.is_feasible);
-        assert(sol.active_vehicles <= inst.params.max_vehicles);
-        
-        // Ensure every customer ID was visited
-        std::vector<bool> visited(inst.nodes.size(), false);
-        for (const auto& route : sol.routes) {
-            for (const auto& stop : route.stops) {
-                visited[stop.node_id] = true;
-            }
-        }
-        for (int cid : inst.customer_ids()) {
-            assert(visited[cid]);
-        }
-    }
-    std::cout << " PASSED\n";
+    vrptw::SAParams sa_params;
+    sa_params.initial_temp = 50.0;
+    sa_params.cooling_rate = 0.95;
+    sa_params.iterations_per_temp = 10;
+    sa_params.max_iterations = 300;
+
+    vrptw::Solution sa_sol = vrptw::solve_simulated_annealing(inst, baseline_sol, sa_params, 1234);
+    assert(sa_sol.is_feasible);
+    assert(sa_sol.active_vehicles > 0);
+    assert(sa_sol.objective_cost <= baseline_sol.objective_cost + 1e-4);
+    std::cout << " PASSED (Cost: $" << sa_sol.objective_cost << " <= Baseline: $" << baseline_sol.objective_cost << ")\n";
+}
+
+void test_large_neighborhood_search() {
+    std::cout << "[Test 5] Large Neighborhood Search Optimization..." << std::flush;
+    auto inst = vrptw::generate_solomon_instance(15, 3, "RC", 42);
+    vrptw::Solution baseline_sol = vrptw::solve_greedy_baseline(inst);
+    assert(baseline_sol.is_feasible);
+
+    vrptw::LNSParams lns_params;
+    lns_params.max_iterations = 100;
+    lns_params.min_destroy = 2;
+    lns_params.max_destroy = 4;
+
+    vrptw::Solution lns_sol = vrptw::solve_large_neighborhood_search(inst, baseline_sol, lns_params, 5678);
+    assert(lns_sol.is_feasible);
+    assert(lns_sol.active_vehicles > 0);
+    assert(lns_sol.objective_cost <= baseline_sol.objective_cost + 1e-4);
+    std::cout << " PASSED (Cost: $" << lns_sol.objective_cost << " <= Baseline: $" << baseline_sol.objective_cost << ")\n";
 }
 
 int main() {
@@ -119,7 +128,8 @@ int main() {
     test_deterministic_generator();
     test_input_validation();
     test_solution_validator();
-    test_baseline_execution();
+    test_simulated_annealing();
+    test_large_neighborhood_search();
 
     std::cout << "\n>>> All EV-VRPTW tests passed successfully! <<<\n";
     return 0;

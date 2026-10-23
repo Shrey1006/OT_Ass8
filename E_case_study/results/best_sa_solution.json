@@ -1,0 +1,49 @@
+{
+  "is_feasible": true,
+  "infeasibility_reason": "Valid",
+  "objective_cost": 1149.93,
+  "total_distance": 577.333,
+  "active_vehicles": 4,
+  "total_tardiness": 54.8529,
+  "total_energy": 305.289,
+  "total_recharges": 1,
+  "makespan": 24.0863,
+  "routes": [
+    {
+      "vehicle_id": 1,
+      "distance": 121.773,
+      "time": 14.7656,
+      "energy": 69.3249,
+      "tardiness": 10.046,
+      "recharges": 0,
+      "stops": [0, 20, 23, 21, 16, 22, 9, 0]
+    },
+    {
+      "vehicle_id": 2,
+      "distance": 110.525,
+      "time": 18.6216,
+      "energy": 58.8712,
+      "tardiness": 21.2146,
+      "recharges": 0,
+      "stops": [0, 1, 3, 11, 12, 14, 4, 25, 2, 0]
+    },
+    {
+      "vehicle_id": 3,
+      "distance": 119.189,
+      "time": 14.1661,
+      "energy": 63.4898,
+      "tardiness": 4.4826,
+      "recharges": 0,
+      "stops": [0, 6, 10, 5, 24, 13, 18, 8, 0]
+    },
+    {
+      "vehicle_id": 4,
+      "distance": 225.846,
+      "time": 24.0863,
+      "energy": 113.604,
+      "tardiness": 19.1097,
+      "recharges": 1,
+      "stops": [0, 15, 7, 17, 27, 19, 0]
+    }
+  ]
+}
