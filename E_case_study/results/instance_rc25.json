@@ -1,0 +1,316 @@
+{
+  "name": "EV-VRPTW-RC-25-seed42",
+  "params": {
+    "vehicle_capacity": 150,
+    "battery_capacity": 80,
+    "energy_consumption_base": 0.45,
+    "energy_consumption_load": 0.0015,
+    "recharge_rate": 30,
+    "speed": 40,
+    "cost_per_km": 1.2,
+    "fixed_cost_per_vehicle": 80,
+    "tardiness_penalty_rate": 2.5
+  },
+  "nodes": [
+    {
+      "id": 0,
+      "type": "DEPOT",
+      "x": 50,
+      "y": 50,
+      "demand": 0,
+      "ready_time": 0,
+      "due_time": 24,
+      "service_time": 0
+    },
+    {
+      "id": 1,
+      "type": "CUSTOMER",
+      "x": 64.9815,
+      "y": 49.9307,
+      "demand": 10.3,
+      "ready_time": 11.63,
+      "due_time": 14.7233,
+      "service_time": 0.36
+    },
+    {
+      "id": 2,
+      "type": "CUSTOMER",
+      "x": 85.6559,
+      "y": 70.2575,
+      "demand": 21.2,
+      "ready_time": 2.04,
+      "due_time": 5.40901,
+      "service_time": 0.21
+    },
+    {
+      "id": 3,
+      "type": "CUSTOMER",
+      "x": 70.9169,
+      "y": 54.3344,
+      "demand": 21.2,
+      "ready_time": 2.53,
+      "due_time": 5.89291,
+      "service_time": 0.43
+    },
+    {
+      "id": 4,
+      "type": "CUSTOMER",
+      "x": 70.0776,
+      "y": 74.3466,
+      "demand": 11.1,
+      "ready_time": 12.7,
+      "due_time": 15.2401,
+      "service_time": 0.48
+    },
+    {
+      "id": 5,
+      "type": "CUSTOMER",
+      "x": 79.4363,
+      "y": 31.4467,
+      "demand": 23.4,
+      "ready_time": 4.24,
+      "due_time": 7.25795,
+      "service_time": 0.35
+    },
+    {
+      "id": 6,
+      "type": "CUSTOMER",
+      "x": 63.4899,
+      "y": 34.1908,
+      "demand": 20.9,
+      "ready_time": 1.73,
+      "due_time": 5.28129,
+      "service_time": 0.23
+    },
+    {
+      "id": 7,
+      "type": "CUSTOMER",
+      "x": 45.4749,
+      "y": 89.6359,
+      "demand": 24.9,
+      "ready_time": 10.11,
+      "due_time": 13.7632,
+      "service_time": 0.39
+    },
+    {
+      "id": 8,
+      "type": "CUSTOMER",
+      "x": 48.2172,
+      "y": 17.6464,
+      "demand": 17.8,
+      "ready_time": 9.17,
+      "due_time": 11.5822,
+      "service_time": 0.29
+    },
+    {
+      "id": 9,
+      "type": "CUSTOMER",
+      "x": 34.4388,
+      "y": 64.8843,
+      "demand": 28.2,
+      "ready_time": 13.81,
+      "due_time": 17.2778,
+      "service_time": 0.4
+    },
+    {
+      "id": 10,
+      "type": "CUSTOMER",
+      "x": 73.5078,
+      "y": 42.2047,
+      "demand": 33.4,
+      "ready_time": 5.46,
+      "due_time": 8.80533,
+      "service_time": 0.3
+    },
+    {
+      "id": 11,
+      "type": "CUSTOMER",
+      "x": 72.9481,
+      "y": 53.7734,
+      "demand": 24.8,
+      "ready_time": 10.52,
+      "due_time": 12.1679,
+      "service_time": 0.36
+    },
+    {
+      "id": 12,
+      "type": "CUSTOMER",
+      "x": 68.8271,
+      "y": 58.9406,
+      "demand": 19.9,
+      "ready_time": 12.58,
+      "due_time": 14.6553,
+      "service_time": 0.48
+    },
+    {
+      "id": 13,
+      "type": "CUSTOMER",
+      "x": 77.2226,
+      "y": 22.9873,
+      "demand": 12.3,
+      "ready_time": 8.44,
+      "due_time": 10.2228,
+      "service_time": 0.47
+    },
+    {
+      "id": 14,
+      "type": "CUSTOMER",
+      "x": 75.8757,
+      "y": 72.6014,
+      "demand": 18.9,
+      "ready_time": 15.67,
+      "due_time": 19.6607,
+      "service_time": 0.43
+    },
+    {
+      "id": 15,
+      "type": "CUSTOMER",
+      "x": 39.7126,
+      "y": 76.582,
+      "demand": 29.1,
+      "ready_time": 14.92,
+      "due_time": 16.5841,
+      "service_time": 0.4
+    },
+    {
+      "id": 16,
+      "type": "CUSTOMER",
+      "x": 33.4516,
+      "y": 43.3184,
+      "demand": 14,
+      "ready_time": 8.39,
+      "due_time": 10.6173,
+      "service_time": 0.46
+    },
+    {
+      "id": 17,
+      "type": "CUSTOMER",
+      "x": 44.2943,
+      "y": 16.394,
+      "demand": 31.9,
+      "ready_time": 15.26,
+      "due_time": 18.8972,
+      "service_time": 0.44
+    },
+    {
+      "id": 18,
+      "type": "CUSTOMER",
+      "x": 69.5732,
+      "y": 15.6036,
+      "demand": 15.2,
+      "ready_time": 7.99,
+      "due_time": 10.322,
+      "service_time": 0.39
+    },
+    {
+      "id": 19,
+      "type": "CUSTOMER",
+      "x": 91.4329,
+      "y": 11.4184,
+      "demand": 14.1,
+      "ready_time": 2.66,
+      "due_time": 5.16115,
+      "service_time": 0.4
+    },
+    {
+      "id": 20,
+      "type": "CUSTOMER",
+      "x": 51.34,
+      "y": 63.728,
+      "demand": 28,
+      "ready_time": 8.95,
+      "due_time": 11.4433,
+      "service_time": 0.35
+    },
+    {
+      "id": 21,
+      "type": "CUSTOMER",
+      "x": 25.009,
+      "y": 37.9745,
+      "demand": 23.9,
+      "ready_time": 4.45,
+      "due_time": 7.03112,
+      "service_time": 0.22
+    },
+    {
+      "id": 22,
+      "type": "CUSTOMER",
+      "x": 27.4165,
+      "y": 57.8595,
+      "demand": 34.8,
+      "ready_time": 6.75,
+      "due_time": 9.45555,
+      "service_time": 0.47
+    },
+    {
+      "id": 23,
+      "type": "CUSTOMER",
+      "x": 46.2002,
+      "y": 34.8277,
+      "demand": 17.2,
+      "ready_time": 10.91,
+      "due_time": 12.5664,
+      "service_time": 0.34
+    },
+    {
+      "id": 24,
+      "type": "CUSTOMER",
+      "x": 79.2393,
+      "y": 28.8021,
+      "demand": 15,
+      "ready_time": 11.05,
+      "due_time": 13.229,
+      "service_time": 0.2
+    },
+    {
+      "id": 25,
+      "type": "CUSTOMER",
+      "x": 81.9399,
+      "y": 73.787,
+      "demand": 20.2,
+      "ready_time": 11.66,
+      "due_time": 15.5737,
+      "service_time": 0.23
+    },
+    {
+      "id": 26,
+      "type": "RECHARGE_STATION",
+      "x": 25,
+      "y": 25,
+      "demand": 0,
+      "ready_time": 0,
+      "due_time": 24,
+      "service_time": 0
+    },
+    {
+      "id": 27,
+      "type": "RECHARGE_STATION",
+      "x": 75,
+      "y": 25,
+      "demand": 0,
+      "ready_time": 0,
+      "due_time": 24,
+      "service_time": 0
+    },
+    {
+      "id": 28,
+      "type": "RECHARGE_STATION",
+      "x": 25,
+      "y": 75,
+      "demand": 0,
+      "ready_time": 0,
+      "due_time": 24,
+      "service_time": 0
+    },
+    {
+      "id": 29,
+      "type": "RECHARGE_STATION",
+      "x": 75,
+      "y": 75,
+      "demand": 0,
+      "ready_time": 0,
+      "due_time": 24,
+      "service_time": 0
+    }
+  ]
+}
