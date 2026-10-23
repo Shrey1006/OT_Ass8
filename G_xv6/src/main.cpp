@@ -5,7 +5,7 @@
 
 int main() {
     std::cout << "========================================================================\n";
-    std::cout << " Track G1: xv6 (RISC-V) Environment Verification & Setup Diagnostic     \n";
+    std::cout << " Track G2: xv6 (RISC-V) Lottery Scheduler & settickets Benchmark       \n";
     std::cout << "========================================================================\n";
 
     // 1. Verify Compiler and QEMU availability

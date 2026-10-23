@@ -146,6 +146,8 @@ found:
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
 
+  p->tickets = 10; // Default lottery ticket allocation
+
   return p;
 }
 
@@ -274,6 +276,7 @@ kfork(void)
     return -1;
   }
   np->sz = p->sz;
+  np->tickets = p->tickets; // Child inherits parent's ticket allocation
 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
@@ -418,10 +421,19 @@ kwait(uint64 addr)
   }
 }
 
+// 64-bit Linear Congruential Generator (LCG) for lottery ticket drawing
+static unsigned long rand_seed = 0x123456789ABCDEFULL;
+static unsigned long
+rand64(void)
+{
+  rand_seed = rand_seed * 6364136223846793005ULL + 1442695040888963407ULL;
+  return rand_seed;
+}
+
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
-//  - choose a process to run.
+//  - choose a process to run via lottery scheduling
 //  - swtch to start running that process.
 //  - eventually that process transfers control
 //    via swtch back to the scheduler.
@@ -441,24 +453,49 @@ scheduler(void)
     intr_on();
     intr_off();
 
-    int found = 0;
+    // Pass 1: Compute total tickets across all RUNNABLE processes
+    int total_tickets = 0;
     for (p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if (p->state == RUNNABLE) {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
+        total_tickets += p->tickets;
+      }
+      release(&p->lock);
+    }
 
-        // Don't re-enable interrupts on release.
-        mycpu()->intena = 0;
+    if (total_tickets == 0) {
+      // nothing to run; stop running on this core until an interrupt.
+      asm volatile("wfi");
+      continue;
+    }
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
-        found = 1;
+    // Pass 2: Draw a random winning ticket in [0, total_tickets - 1]
+    unsigned long winner = rand64() % total_tickets;
+    long accumulated = 0;
+    int found = 0;
+
+    for (p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if (p->state == RUNNABLE) {
+        accumulated += p->tickets;
+        if (accumulated > winner) {
+          // Switch to chosen process.  It is the process's job
+          // to release its lock and then reacquire it
+          // before jumping back to us.
+          p->state = RUNNING;
+          c->proc = p;
+          swtch(&c->context, &p->context);
+
+          // Don't re-enable interrupts on release.
+          mycpu()->intena = 0;
+
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+          found = 1;
+          release(&p->lock);
+          break;
+        }
       }
       release(&p->lock);
     }

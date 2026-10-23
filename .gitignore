@@ -16,7 +16,8 @@ bin/
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-Makefile
+/Makefile
+!G_xv6/**/Makefile
 
 # IDE and Editor files
 .vscode/

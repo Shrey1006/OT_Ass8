@@ -28,14 +28,35 @@ void test_xv6_binaries() {
     std::cout << " PASSED\n";
 }
 
+void test_lottery_scheduler_artifacts() {
+    std::cout << "[Test 3] Lottery Scheduler Syscall & User Binary..." << std::flush;
+    std::ifstream lottery_bin("G_xv6/xv6-riscv/user/_lotterytest", std::ios::binary);
+    assert(lottery_bin.is_open());
+
+    // Check SYS_settickets in syscall.h
+    std::ifstream sys_hdr("G_xv6/xv6-riscv/kernel/syscall.h");
+    assert(sys_hdr.is_open());
+    std::string line;
+    bool found_sys = false;
+    while (std::getline(sys_hdr, line)) {
+        if (line.find("SYS_settickets") != std::string::npos) {
+            found_sys = true;
+            break;
+        }
+    }
+    assert(found_sys);
+    std::cout << " PASSED\n";
+}
+
 int main() {
     std::cout << "=========================================================\n";
-    std::cout << " Running Track G1: xv6 Toolchain & Binary Unit Tests     \n";
+    std::cout << " Running Track G2: xv6 Lottery Scheduler Unit Tests       \n";
     std::cout << "=========================================================\n";
 
     test_toolchain_availability();
     test_xv6_binaries();
+    test_lottery_scheduler_artifacts();
 
-    std::cout << "\n>>> All xv6 RISC-V Environment Tests PASSED! <<<\n";
+    std::cout << "\n>>> All xv6 RISC-V Environment & Lottery Tests PASSED! <<<\n";
     return 0;
 }
