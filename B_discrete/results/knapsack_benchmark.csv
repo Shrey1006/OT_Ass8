@@ -1,0 +1,21 @@
+size,capacity,method,total_value,total_weight,exact_optimum,optimality_gap_percent,runtime_us,is_exact
+10,109,"Greedy (Value/Weight)",441,85,471,6.36943,5,false
+10,109,"Dynamic Programming",471,108,471,0,45,true
+10,109,"Branch-and-Bound (Fractional Bound)",471,108,471,0,152,true
+10,109,"ILP (Google OR-Tools)",471,108,471,0,75038,true
+20,255,"Greedy (Value/Weight)",860,245,860,0,10,false
+20,255,"Dynamic Programming",860,245,860,0,205,true
+20,255,"Branch-and-Bound (Fractional Bound)",860,245,860,0,312,true
+20,255,"ILP (Google OR-Tools)",860,245,860,0,6815,true
+50,652,"Greedy (Value/Weight)",2160,651,2160,0,22,false
+50,652,"Dynamic Programming",2160,651,2160,0,1119,true
+50,652,"Branch-and-Bound (Fractional Bound)",2160,651,2160,0,883,true
+50,652,"ILP (Google OR-Tools)",2160,651,2160,0,3815,true
+100,1338,"Greedy (Value/Weight)",4322,1332,4340,0.414747,44,false
+100,1338,"Dynamic Programming",4340,1338,4340,0,4505,true
+100,1338,"Branch-and-Bound (Fractional Bound)",4340,1338,4340,0,1374,true
+100,1338,"ILP (Google OR-Tools)",4340,1338,4340,0,14121,true
+500,6944,"Greedy (Value/Weight)",20924,6944,20924,0,221,false
+500,6944,"Dynamic Programming",20924,6944,20924,0,116275,true
+500,6944,"Branch-and-Bound (Fractional Bound)",20924,6944,20924,0,5383,true
+500,6944,"ILP (Google OR-Tools)",20924,6944,20924,0,31122,true

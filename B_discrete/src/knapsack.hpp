@@ -99,7 +99,7 @@ public:
      */
     static KnapsackResult solve_greedy(const KnapsackInstance& inst) {
         validate_instance(inst);
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
 
         const size_t n = inst.items.size();
         std::vector<size_t> order(n);
@@ -141,7 +141,7 @@ public:
             current_wt = inst.items[best_single].weight;
         }
 
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         KnapsackResult res;
         res.method = "Greedy (Value/Weight)";
         res.total_value = current_val;
@@ -158,7 +158,7 @@ public:
      */
     static KnapsackResult solve_dynamic_programming(const KnapsackInstance& inst) {
         validate_instance(inst);
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
 
         const size_t n = inst.items.size();
         const size_t W = static_cast<size_t>(inst.capacity);
@@ -194,7 +194,7 @@ public:
             if (selected[i]) total_wt += inst.items[i].weight;
         }
 
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         KnapsackResult res;
         res.method = "Dynamic Programming";
         res.total_value = dp[n][W];
@@ -211,7 +211,7 @@ public:
      */
     static KnapsackResult solve_branch_and_bound(const KnapsackInstance& inst) {
         validate_instance(inst);
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
 
         const size_t n = inst.items.size();
 
@@ -325,7 +325,7 @@ public:
             }
         }
 
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         KnapsackResult res;
         res.method = "Branch-and-Bound (Fractional Bound)";
         res.total_value = best_val;
@@ -349,7 +349,7 @@ public:
         validate_instance(inst);
 
 #if HAS_ORTOOLS
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::steady_clock::now();
         const size_t n = inst.items.size();
 
         // Instantiate SCIP or CBC solver through MPSolver
@@ -397,7 +397,7 @@ public:
             }
         }
 
-        auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::steady_clock::now();
         KnapsackResult res;
         res.method = "ILP (Google OR-Tools)";
         res.total_value = objective->Value();
