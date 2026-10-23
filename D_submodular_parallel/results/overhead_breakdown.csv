@@ -1,0 +1,10 @@
+granularity,paths_per_task,num_tasks,threads,runtime_ms,speedup,efficiency
+"Coarse-Grained (High Arithmetic Intensity)",50000,40,1,449.023,1.0356,1.0356
+"Coarse-Grained (High Arithmetic Intensity)",50000,40,4,154.562,3.00855,0.752138
+"Coarse-Grained (High Arithmetic Intensity)",50000,40,8,156.851,2.96463,0.370579
+"Medium-Grained",2500,800,1,489.076,1.12879,1.12879
+"Medium-Grained",2500,800,4,163.027,3.38635,0.846586
+"Medium-Grained",2500,800,8,151.954,3.63311,0.454139
+"Fine-Grained (Severe Synchronization Overhead)",50,40000,1,996.089,0.978045,0.978045
+"Fine-Grained (Severe Synchronization Overhead)",50,40000,4,375.285,2.59594,0.648986
+"Fine-Grained (Severe Synchronization Overhead)",50,40000,8,360.521,2.70226,0.337782
