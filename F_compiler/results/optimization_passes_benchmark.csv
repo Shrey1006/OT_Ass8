@@ -1,0 +1,16 @@
+id,name,unopt_tac,opt_tac,tac_reduction_pct,unopt_cycles,opt_cycles,cycles_reduction_pct,folded,strength_red,cses,dces,output_match
+1,p01_arithmetic,16,4,75,43,9,79.0698,7,0,0,12,true
+2,p02_variable_assign,13,7,46.1538,33,15,54.5455,7,0,0,6,true
+3,p03_if_simple,11,7,36.3636,23,13,43.4783,4,0,0,4,true
+4,p04_if_else,17,10,41.1765,29,13,55.1724,6,0,0,7,true
+5,p05_nested_if,23,17,26.087,32,22,31.25,6,0,0,6,true
+6,p06_while_countdown,16,14,12.5,134,130,2.98507,2,0,0,2,true
+7,p07_factorial,16,14,12.5,157,153,2.54777,2,0,0,2,true
+8,p08_fibonacci,21,16,23.8095,275,247,10.1818,4,0,0,5,true
+9,p09_collatz,36,34,5.55556,5364,5360,0.0745712,3,0,0,2,true
+10,p10_gcd_euclid,15,13,13.3333,76,72,5.26316,2,0,0,2,true
+11,p11_power_exp,26,23,11.5385,152,146,3.94737,3,0,0,3,true
+12,p12_prime_check,46,38,17.3913,549,535,2.55009,8,0,0,8,true
+13,p13_nested_loops,28,25,10.7143,839,825,1.66865,3,0,0,3,true
+14,p14_boolean_logic,36,25,30.5556,82,54,34.1463,12,0,0,11,true
+15,p15_sum_of_squares,32,28,12.5,313,305,2.55591,3,1,0,4,true

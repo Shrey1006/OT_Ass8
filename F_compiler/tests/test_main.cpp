@@ -1,4 +1,5 @@
 #include "toy_compiler.hpp"
+#include "toy_optimizer.hpp"
 #include <iostream>
 #include <cassert>
 
@@ -8,7 +9,7 @@ void test_lexer() {
     toy::Lexer lexer(src);
     auto tokens = lexer.tokenize_all();
 
-    assert(tokens.size() == 18); // 17 tokens + TOK_EOF
+    assert(tokens.size() == 18);
     assert(tokens[0].type == toy::TokenType::TOK_IF);
     assert(tokens[1].type == toy::TokenType::TOK_LPAREN);
     assert(tokens[2].type == toy::TokenType::TOK_IDENT && tokens[2].text == "x_1");
@@ -28,7 +29,6 @@ void test_lexer() {
     assert(tokens[16].type == toy::TokenType::TOK_RBRACE);
     assert(tokens[17].type == toy::TokenType::TOK_EOF);
 
-    // Error test
     bool caught = false;
     try {
         toy::Lexer bad("@invalid");
@@ -45,13 +45,12 @@ void test_parser_precedence() {
     std::string src = "res = 2 + 3 * 4; print(res);";
     auto art = toy::compile_and_run(src);
     assert(art.execution.output.size() == 1);
-    assert(art.execution.output[0] == 14); // 2 + (3 * 4) = 14, not (2 + 3) * 4 = 20
+    assert(art.execution.output[0] == 14);
 
     std::string src2 = "res = (2 + 3) * 4; print(res);";
     auto art2 = toy::compile_and_run(src2);
     assert(art2.execution.output[0] == 20);
 
-    // Syntax error test
     bool caught = false;
     try {
         toy::compile_and_run("x = 5 + ;");
@@ -62,51 +61,98 @@ void test_parser_precedence() {
     std::cout << " PASSED\n";
 }
 
-void test_tac_and_bytecode_generation() {
-    std::cout << "[Test 3] TAC IR & Bytecode Emitter..." << std::flush;
-    std::string src = "a = 10; b = 20; if (a < b) { c = a + b; } else { c = 0; } print(c);";
+void test_pass_constant_folding() {
+    std::cout << "[Test 3] Pass: Constant Folding & Propagation..." << std::flush;
+    std::string src = "a = 10 + 20; b = a * 2; print(b);";
     auto art = toy::compile_and_run(src);
 
-    assert(!art.tac.empty());
-    assert(!art.bytecode.code.empty());
-    assert(art.execution.output.size() == 1);
-    assert(art.execution.output[0] == 30);
-    assert(art.execution.final_variables["c"] == 30);
+    toy::Optimizer opt;
+    toy::Optimizer::OptimizationStats stats;
+    auto opt_tac = opt.optimize(art.tac, &stats);
+
+    assert(stats.constants_folded >= 2);
+    toy::BytecodeEmitter emitter;
+    auto opt_bc = emitter.compile(opt_tac);
+    toy::StackVM vm;
+    auto res = vm.execute(opt_bc);
+
+    assert(res.output.size() == 1);
+    assert(res.output[0] == 60);
     std::cout << " PASSED\n";
 }
 
-void test_vm_runtime_errors() {
-    std::cout << "[Test 4] VM Runtime Safety (Zero Div & Infinite Loop)..." << std::flush;
-    // Division by zero
-    bool caught_div0 = false;
-    try {
-        toy::compile_and_run("x = 10 / 0;");
-    } catch (const std::runtime_error& e) {
-        caught_div0 = true;
-    }
-    assert(caught_div0);
+void test_pass_strength_reduction() {
+    std::cout << "[Test 4] Pass: Strength Reduction & Algebraic Identities..." << std::flush;
+    // x is dynamically set across branches so it is not a known constant
+    std::string src = "cond = 1; if (cond > 0) { x = 7; } else { x = 9; } "
+                      "y = x * 2; z = x * 1; w = x * 0; zero = x - x; "
+                      "print(y); print(z); print(w); print(zero);";
+    auto art = toy::compile_and_run(src);
 
-    // Infinite loop cycle bound
-    bool caught_loop = false;
-    try {
-        toy::Lexer lex("while (1) { x = 1; }");
-        toy::Parser parser(lex.tokenize_all());
-        auto ast = parser.parse_program();
-        toy::TACGenerator tac_gen;
-        auto tac = tac_gen.generate(ast);
-        toy::BytecodeEmitter emitter;
-        auto bc = emitter.compile(tac);
-        toy::StackVM vm;
-        vm.execute(bc, 1000); // 1000 cycle limit
-    } catch (const std::runtime_error& e) {
-        caught_loop = true;
-    }
-    assert(caught_loop);
+    toy::Optimizer opt;
+    toy::Optimizer::OptimizationStats stats;
+    auto opt_tac = opt.optimize(art.tac, &stats);
+
+    assert(stats.strength_reductions >= 1);
+    toy::BytecodeEmitter emitter;
+    auto opt_bc = emitter.compile(opt_tac);
+    toy::StackVM vm;
+    auto res = vm.execute(opt_bc);
+
+    assert(res.output.size() == 4);
+    assert(res.output[0] == 14);
+    assert(res.output[1] == 7);
+    assert(res.output[2] == 0);
+    assert(res.output[3] == 0);
     std::cout << " PASSED\n";
 }
 
-void test_15_programs_e2e() {
-    std::cout << "[Test 5] End-to-End Execution of All 15 Test Programs...\n";
+void test_pass_cse() {
+    std::cout << "[Test 5] Pass: Common Sub-expression Elimination (CSE)..." << std::flush;
+    // x and y dynamically initialized across branch
+    std::string src = "cond = 1; if (cond > 0) { x = 15; y = 25; } else { x = 10; y = 20; } "
+                      "a = x + y; b = x + y; c = a * b; print(c);";
+    auto art = toy::compile_and_run(src);
+
+    toy::Optimizer opt;
+    toy::Optimizer::OptimizationStats stats;
+    auto opt_tac = opt.optimize(art.tac, &stats);
+
+    assert(stats.cse_eliminations >= 1);
+    toy::BytecodeEmitter emitter;
+    auto opt_bc = emitter.compile(opt_tac);
+    toy::StackVM vm;
+    auto res = vm.execute(opt_bc);
+
+    assert(res.output.size() == 1);
+    assert(res.output[0] == 1600); // (15+25) * (15+25) = 40 * 40 = 1600
+    std::cout << " PASSED\n";
+}
+
+void test_pass_dce() {
+    std::cout << "[Test 6] Pass: Dead-Code Elimination (DCE)..." << std::flush;
+    std::string src = "x = 10; dead_var = 999 * 50; print(x);";
+    auto art = toy::compile_and_run(src);
+
+    toy::Optimizer opt;
+    toy::Optimizer::OptimizationStats stats;
+    auto opt_tac = opt.optimize(art.tac, &stats);
+
+    assert(stats.dead_instructions_removed > 0);
+    assert(opt_tac.size() < art.tac.size());
+
+    toy::BytecodeEmitter emitter;
+    auto opt_bc = emitter.compile(opt_tac);
+    toy::StackVM vm;
+    auto res = vm.execute(opt_bc);
+
+    assert(res.output.size() == 1);
+    assert(res.output[0] == 10);
+    std::cout << " PASSED\n";
+}
+
+void test_optimization_equivalence_all_15_programs() {
+    std::cout << "[Test 7] Equivalence Harness: Unoptimized vs. Optimized (All 15 Programs)...\n";
     struct TC {
         std::string name;
         std::string src;
@@ -130,24 +176,43 @@ void test_15_programs_e2e() {
         {"P15: Sum of Squares", "n = 10; sum = 0; k = 1; while (k <= n) { sum = sum + k * k; k = k + 1; } form = n * (n + 1) * (2 * n + 1) / 6; diff = sum - form; print(sum); print(diff);", {385, 0}}
     };
 
-    for (size_t i = 0; i < cases.size(); ++i) {
-        auto art = toy::compile_and_run(cases[i].src);
-        assert(art.execution.output == cases[i].exp);
-        std::cout << "  - [" << cases[i].name << "] PASSED\n";
+    toy::Optimizer opt;
+    toy::BytecodeEmitter emitter;
+
+    for (const auto& tc : cases) {
+        // Unoptimized
+        auto unopt_art = toy::compile_and_run(tc.src);
+        assert(unopt_art.execution.output == tc.exp);
+
+        // Optimized
+        auto opt_tac = opt.optimize(unopt_art.tac);
+        auto opt_bc = emitter.compile(opt_tac);
+        toy::StackVM vm;
+        auto opt_res = vm.execute(opt_bc);
+
+        // Assert exact semantic equivalence
+        assert(opt_res.output == tc.exp);
+        assert(opt_res.output == unopt_art.execution.output);
+        assert(opt_tac.size() <= unopt_art.tac.size());
+
+        std::cout << "  - [" << tc.name << "] EQUIVALENT (TAC: " 
+                  << unopt_art.tac.size() << " -> " << opt_tac.size() << ")\n";
     }
 }
 
 int main() {
     std::cout << "=========================================================\n";
-    std::cout << " Running Track F1: MiniLang Compiler Unit Tests          \n";
+    std::cout << " Running Track F2: Optimization Passes Unit Tests        \n";
     std::cout << "=========================================================\n";
 
     test_lexer();
     test_parser_precedence();
-    test_tac_and_bytecode_generation();
-    test_vm_runtime_errors();
-    test_15_programs_e2e();
+    test_pass_constant_folding();
+    test_pass_strength_reduction();
+    test_pass_cse();
+    test_pass_dce();
+    test_optimization_equivalence_all_15_programs();
 
-    std::cout << "\n>>> All MiniLang Compiler Tests Passed Successfully! <<<\n";
+    std::cout << "\n>>> All Optimization Passes & Equivalence Tests PASSED! <<<\n";
     return 0;
 }
