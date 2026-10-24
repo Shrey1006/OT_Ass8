@@ -62,16 +62,37 @@ void test_benchmark_binaries() {
     std::cout << " PASSED\n";
 }
 
+void test_cow_artifacts() {
+    std::cout << "[Test 5] Copy-on-Write (COW) Kernel & User Artifacts..." << std::flush;
+    std::ifstream cow_bin("G_xv6/xv6-riscv/user/_cowtest", std::ios::binary);
+    assert(cow_bin.is_open());
+
+    // Check PTE_COW in riscv.h
+    std::ifstream riscv_hdr("G_xv6/xv6-riscv/kernel/riscv.h");
+    assert(riscv_hdr.is_open());
+    std::string line;
+    bool found_cow = false;
+    while (std::getline(riscv_hdr, line)) {
+        if (line.find("PTE_COW") != std::string::npos) {
+            found_cow = true;
+            break;
+        }
+    }
+    assert(found_cow);
+    std::cout << " PASSED\n";
+}
+
 int main() {
     std::cout << "=========================================================\n";
-    std::cout << " Running Track G3: xv6 Benchmark Suite Unit Tests        \n";
+    std::cout << " Running Track G4: xv6 Copy-on-Write (COW) Unit Tests    \n";
     std::cout << "=========================================================\n";
 
     test_toolchain_availability();
     test_xv6_binaries();
     test_lottery_scheduler_artifacts();
     test_benchmark_binaries();
+    test_cow_artifacts();
 
-    std::cout << "\n>>> All xv6 RISC-V Environment & Benchmark Tests PASSED! <<<\n";
+    std::cout << "\n>>> All xv6 RISC-V Environment & COW Tests PASSED! <<<\n";
     return 0;
 }

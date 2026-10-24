@@ -290,18 +290,15 @@ uvmfree(pagetable_t pagetable, uint64 sz)
 }
 
 // Given a parent process's page table, copy
-// its memory into a child's page table.
-// Copies both the page table and the
-// physical memory.
-// returns 0 on success, -1 on failure.
-// frees any allocated pages on failure.
+// its memory into a child's page table using Copy-on-Write.
+// Instead of allocating new physical pages, the child shares
+// parent's physical pages with write permission cleared and PTE_COW set.
 int
 uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 {
   pte_t *pte;
   uint64 pa, i;
   uint flags;
-  char *mem;
 
   for (i = 0; i < sz; i += PGSIZE) {
     if ((pte = walk(old, i, 0)) == 0)
@@ -310,19 +307,53 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
       continue; // physical page hasn't been allocated
     pa = PTE2PA(*pte);
     flags = PTE_FLAGS(*pte);
-    if ((mem = kalloc()) == 0)
-      goto err;
-    memmove(mem, (char *)pa, PGSIZE);
-    if (mappages(new, i, PGSIZE, (uint64)mem, flags) != 0) {
-      kfree(mem);
+    if (flags & PTE_W) {
+      // Clear write permission and mark as Copy-on-Write
+      flags = (flags & ~PTE_W) | PTE_COW;
+      *pte = PA2PTE(pa) | flags;
+    }
+    if (mappages(new, i, PGSIZE, pa, flags) != 0) {
       goto err;
     }
+    kref_inc((void *)pa);
   }
+  sfence_vma();
   return 0;
 
 err:
   uvmunmap(new, 0, i / PGSIZE, 1);
   return -1;
+}
+
+// Handle a Copy-on-Write page fault at virtual address va.
+// If the page is marked PTE_COW, allocates a private physical page if refcount > 1,
+// or upgrades in-place if refcount == 1, then sets PTE_W and clears PTE_COW.
+int
+cow_fault(pagetable_t pagetable, uint64 va)
+{
+  if (va >= MAXVA)
+    return -1;
+
+  va = PGROUNDDOWN(va);
+  pte_t *pte = walk(pagetable, va, 0);
+  if (pte == 0)
+    return -1;
+  if ((*pte & PTE_V) == 0)
+    return -1;
+  if ((*pte & PTE_U) == 0)
+    return -1;
+  if ((*pte & PTE_COW) == 0)
+    return -1; // Not a COW page
+
+  uint64 pa = PTE2PA(*pte);
+  void *new_pa = kcow_page((void *)pa);
+  if (new_pa == 0)
+    return -1;
+
+  uint flags = (PTE_FLAGS(*pte) & ~PTE_COW) | PTE_W;
+  *pte = PA2PTE(new_pa) | flags;
+  sfence_vma();
+  return 0;
 }
 
 // mark a PTE invalid for user access.
@@ -360,8 +391,16 @@ copyout(pagetable_t pagetable, uint64 psz, uint64 dstva, char *src, uint64 len)
     }
 
     pte = walk(pagetable, va0, 0);
+    // If the destination page is Copy-on-Write, duplicate/upgrade before kernel writes to it
+    if (pte && (*pte & PTE_V) && (*pte & PTE_COW)) {
+      if (cow_fault(pagetable, va0) != 0)
+        return -1;
+      pa0 = walkaddr(pagetable, va0);
+      pte = walk(pagetable, va0, 0);
+    }
+
     // forbid copyout over read-only user text pages.
-    if ((*pte & PTE_W) == 0)
+    if (pte == 0 || (*pte & PTE_W) == 0)
       return -1;
 
     n = PGSIZE - (dstva - va0);

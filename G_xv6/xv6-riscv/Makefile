@@ -159,6 +159,7 @@ UPROGS=\
 	$U/_bench_cpu\
 	$U/_bench_io\
 	$U/_bench_mixed\
+	$U/_cowtest\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
