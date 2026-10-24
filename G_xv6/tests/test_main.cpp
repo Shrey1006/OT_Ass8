@@ -48,15 +48,30 @@ void test_lottery_scheduler_artifacts() {
     std::cout << " PASSED\n";
 }
 
+void test_benchmark_binaries() {
+    std::cout << "[Test 4] Benchmark Binaries (_bench_cpu, _bench_io, _bench_mixed)..." << std::flush;
+    std::ifstream cpu_bin("G_xv6/xv6-riscv/user/_bench_cpu", std::ios::binary);
+    assert(cpu_bin.is_open());
+
+    std::ifstream io_bin("G_xv6/xv6-riscv/user/_bench_io", std::ios::binary);
+    assert(io_bin.is_open());
+
+    std::ifstream mixed_bin("G_xv6/xv6-riscv/user/_bench_mixed", std::ios::binary);
+    assert(mixed_bin.is_open());
+
+    std::cout << " PASSED\n";
+}
+
 int main() {
     std::cout << "=========================================================\n";
-    std::cout << " Running Track G2: xv6 Lottery Scheduler Unit Tests       \n";
+    std::cout << " Running Track G3: xv6 Benchmark Suite Unit Tests        \n";
     std::cout << "=========================================================\n";
 
     test_toolchain_availability();
     test_xv6_binaries();
     test_lottery_scheduler_artifacts();
+    test_benchmark_binaries();
 
-    std::cout << "\n>>> All xv6 RISC-V Environment & Lottery Tests PASSED! <<<\n";
+    std::cout << "\n>>> All xv6 RISC-V Environment & Benchmark Tests PASSED! <<<\n";
     return 0;
 }

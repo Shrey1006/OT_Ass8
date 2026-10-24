@@ -89,6 +89,10 @@ ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]nopie'),)
 CFLAGS += -fno-pie -nopie
 endif
 
+ifeq ($(SCHED),RR)
+CFLAGS += -DROUND_ROBIN
+endif
+
 LDFLAGS = -z max-page-size=4096
 
 $K/kernel: $(OBJS) $K/kernel.ld
@@ -152,6 +156,9 @@ UPROGS=\
 	$U/_dorphan\
 	$U/_sync\
 	$U/_lotterytest\
+	$U/_bench_cpu\
+	$U/_bench_io\
+	$U/_bench_mixed\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

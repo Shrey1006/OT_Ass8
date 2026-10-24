@@ -421,6 +421,44 @@ kwait(uint64 addr)
   }
 }
 
+#ifdef ROUND_ROBIN
+// Per-CPU process scheduler (Original xv6 Round-Robin).
+// Each CPU calls scheduler() after setting itself up.
+// Scheduler never returns.  It loops, doing:
+//  - choose a process to run.
+//  - swtch to start running that process.
+//  - eventually that process transfers control
+//    via swtch back to the scheduler.
+void
+scheduler(void)
+{
+  struct proc *p;
+  struct cpu *c = mycpu();
+
+  c->proc = 0;
+  for (;;) {
+    intr_on();
+    intr_off();
+
+    int found = 0;
+    for (p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      if (p->state == RUNNABLE) {
+        p->state = RUNNING;
+        c->proc = p;
+        swtch(&c->context, &p->context);
+        mycpu()->intena = 0;
+        c->proc = 0;
+        found = 1;
+      }
+      release(&p->lock);
+    }
+    if (found == 0) {
+      asm volatile("wfi");
+    }
+  }
+}
+#else
 // 64-bit Linear Congruential Generator (LCG) for lottery ticket drawing
 static unsigned long rand_seed = 0x123456789ABCDEFULL;
 static unsigned long
@@ -430,7 +468,7 @@ rand64(void)
   return rand_seed;
 }
 
-// Per-CPU process scheduler.
+// Per-CPU process scheduler (Lottery Scheduler).
 // Each CPU calls scheduler() after setting itself up.
 // Scheduler never returns.  It loops, doing:
 //  - choose a process to run via lottery scheduling
@@ -505,6 +543,7 @@ scheduler(void)
     }
   }
 }
+#endif
 
 // Switch to scheduler.  Must hold only p->lock
 // and have changed proc->state. Saves and restores
