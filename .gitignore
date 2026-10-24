@@ -28,3 +28,8 @@ cmake_install.cmake
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Track H large data and generator artifacts
+H_dbms/data/
+H_dbms/tpch-tool/
+*.tbl
