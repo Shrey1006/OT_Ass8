@@ -11,7 +11,14 @@ echo "========================================================"
 echo " Running All Track Tests - Optimization Techniques Ass8"
 echo "========================================================"
 
-BUILD_DIR="build"
+BUILD_DIR="${1:-}"
+if [ -z "$BUILD_DIR" ]; then
+    if [ -d "build_wsl" ]; then
+        BUILD_DIR="build_wsl"
+    else
+        BUILD_DIR="build"
+    fi
+fi
 
 if [ ! -d "$BUILD_DIR" ]; then
     echo "[INFO] Creating build directory and configuring with CMake..."
@@ -19,7 +26,11 @@ if [ ! -d "$BUILD_DIR" ]; then
 fi
 
 echo "[INFO] Building all track targets..."
-cmake --build "$BUILD_DIR"
+if command -v cmake >/dev/null 2>&1; then
+    cmake --build "$BUILD_DIR"
+else
+    make -C "$BUILD_DIR"
+fi
 
 echo "[INFO] Executing tests for all available tracks..."
 TRACKS=(
