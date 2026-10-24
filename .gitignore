@@ -33,3 +33,11 @@ Thumbs.db
 H_dbms/data/
 H_dbms/tpch-tool/
 *.tbl
+
+# Coverage and Profiling Artifacts
+*.gcda
+*.gcno
+*.gcov
+gmon.out
+J_softeng/pugixml/build*/
+J_softeng/pugixml/*.txt

@@ -1,0 +1,12 @@
+algorithm_name,selected_tests,total_tests,test_reduction_pct,runtime_us,runtime_saving_pct,speedup_factor,covered_subsystems,total_subsystems,coverage_pct
+"Naive Full Suite (Baseline)",953,953,0.00,100413.08,0.00,1.00,29,29,100.00
+"Naive Random (20% Sampling)",191,953,79.96,19913.78,80.17,5.04,27,29,93.10
+"Naive Random (50% Sampling)",477,953,49.95,50536.30,49.67,1.99,29,29,100.00
+"Naive Sequential Prefix (20% Subset)",191,953,79.96,17752.85,82.32,5.66,12,29,41.38
+"Greedy (Unweighted Set Cover)",15,953,98.43,1258.14,98.75,79.81,29,29,100.00
+"Greedy (Time-Weighted Set Cover)",15,953,98.43,1258.14,98.75,79.81,29,29,100.00
+"Exact ILP (Minimum Test Count Set Cover)",14,953,98.53,1567.01,98.44,64.08,29,29,100.00
+"Exact ILP (Optimal Runtime Set Cover)",14,953,98.53,1204.28,98.80,83.38,29,29,100.00
+"Budgeted Prioritization (25% Time Budget)",284,953,70.20,25095.29,75.01,4.00,29,29,100.00
+"Budgeted Prioritization (50% Time Budget)",575,953,39.66,50206.14,50.00,2.00,29,29,100.00
+"Budgeted Prioritization (75% Time Budget)",766,953,19.62,75306.42,25.00,1.33,29,29,100.00
