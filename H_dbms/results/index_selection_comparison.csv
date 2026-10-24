@@ -1,0 +1,19 @@
+budget_kb,budget_mb,method,benefit,size_kb,storage_utilization_pct,runtime_us,optimal,indices_count
+1024,1,"Greedy (Density)",3109.72,808,78.9062,43.555,0,4
+1024,1,"Dynamic Programming (Exact)",3109.72,808,78.9062,166.977,1,4
+1024,1,"ILP / Branch-and-Bound (Exact)",3109.72,808,78.9062,8.293,1,4
+2560,2.5,"Greedy (Density)",5771.09,2328,90.9375,6.962,0,6
+2560,2.5,"Dynamic Programming (Exact)",5771.09,2328,90.9375,363.315,1,6
+2560,2.5,"ILP / Branch-and-Bound (Exact)",5771.09,2328,90.9375,10.952,1,6
+5120,5,"Greedy (Density)",10054.2,4616,90.1562,7.924,0,8
+5120,5,"Dynamic Programming (Exact)",10054.2,4616,90.1562,729.026,1,8
+5120,5,"ILP / Branch-and-Bound (Exact)",10054.2,4616,90.1562,10.134,1,8
+10240,10,"Greedy (Density)",16665.7,9040,88.2812,7.077,0,9
+10240,10,"Dynamic Programming (Exact)",16665.8,9040,88.2812,2388.96,1,9
+10240,10,"ILP / Branch-and-Bound (Exact)",16665.7,9040,88.2812,17.119,1,9
+15360,15,"Greedy (Density)",21158,13288,86.5104,14.502,0,10
+15360,15,"Dynamic Programming (Exact)",21158,13288,86.5104,5502.13,1,10
+15360,15,"ILP / Branch-and-Bound (Exact)",21158,13288,86.5104,17.949,1,10
+25600,25,"Greedy (Density)",24643.7,17536,68.5,9.87,0,11
+25600,25,"Dynamic Programming (Exact)",24643.7,17536,68.5,6090.59,1,11
+25600,25,"ILP / Branch-and-Bound (Exact)",24643.7,17536,68.5,25.455,1,11
