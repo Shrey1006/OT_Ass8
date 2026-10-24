@@ -1,0 +1,4 @@
+configuration,execution_time_ms,speedup_factor,checksum_match
+"A. Inverted Join Order (lineitem -> orders -> customer)",134.29,0.99,YES
+"B. Default Optimizer Join Order (customer -> orders -> lineitem)",132.41,1.00,YES
+"C. Query Rewrite: Early-Filtering CTE (Materialized Subquery)",81.51,1.62,YES

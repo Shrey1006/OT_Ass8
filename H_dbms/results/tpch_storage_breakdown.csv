@@ -1,0 +1,9 @@
+table_name,data_size_kb,baseline_idx_kb,indexed_idx_kb,added_storage_kb,storage_increase_pct
+region,8,16,16,0,0.0
+nation,8,16,16,0,0.0
+supplier,376,40,56,16,3.8
+customer,2920,344,584,240,7.4
+part,3360,456,936,480,12.6
+partsupp,14048,1776,2328,552,3.5
+orders,21728,3312,6640,3328,13.3
+lineitem,92912,18504,31424,12920,11.6

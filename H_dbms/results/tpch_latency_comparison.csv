@@ -1,0 +1,9 @@
+query_id,query_name,baseline_ms,indexed_ms,speedup_factor,baseline_qps,indexed_qps,qps_increase_pct,checksum_match
+Q01,"Pricing Summary Report",995.97,475.42,2.09,1.0,2.1,110.0,MATCH
+Q03,"Shipping Priority",100.46,77.00,1.3,9.95,12.99,30.6,MATCH
+Q04,"Order Priority Checking",193.04,193.17,1.0,5.18,5.18,0.0,MATCH
+Q06,"Forecasting Revenue Change",60.20,50.18,1.2,16.61,19.93,20.0,MATCH
+Q10,"Returned Item Reporting",117.87,217.33,0.54,8.48,4.6,-45.8,MATCH
+Q12,"Shipping Modes and Order Priority",115.01,82.11,1.4,8.69,12.18,40.2,MATCH
+Q14,"Promotion Effect",65.29,33.36,1.96,15.32,29.97,95.6,MATCH
+Q19,"Discounted Revenue",146.57,8.83,16.59,6.82,113.21,1560.0,MATCH
