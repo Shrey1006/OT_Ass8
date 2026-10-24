@@ -18,6 +18,9 @@ std::string exec_cmd(const char* cmd) {
     return result;
 }
 
+// -----------------------------------------------------------------------------
+// Track I1 Tests
+// -----------------------------------------------------------------------------
 void test_deutsch_jozsa() {
     std::cout << "[Test 1] Deutsch-Jozsa Algorithm (Constant vs Balanced Oracle)..." << std::flush;
     std::string cmd = "python3 -c \"import sys; sys.path.append('I_quantum_algorithms/scripts'); sys.path.append('../I_quantum_algorithms/scripts'); from quantum_algorithms import run_deutsch_jozsa; r=run_deutsch_jozsa(3); assert r['constant_oracle']['is_constant']; assert r['balanced_oracle']['is_balanced']; print('OK')\" 2>/dev/null";
@@ -74,29 +77,84 @@ void test_quantum_annealing() {
     std::cout << " PASSED (Ising Ground State Energy Minimized <= -3.5)\n";
 }
 
-void test_summary_csv_artifacts() {
-    std::cout << "[Test 8] Track I1 Results Summary Artifacts Verification..." << std::flush;
+void test_i1_summary_csv() {
+    std::cout << "[Test 8] Track I1 Summary Artifact Verification..." << std::flush;
     std::ifstream csv("I_quantum_algorithms/results/quantum_algorithms_summary.csv");
-    if (!csv.is_open()) {
-        csv.open("../I_quantum_algorithms/results/quantum_algorithms_summary.csv");
-    }
+    if (!csv.is_open()) csv.open("../I_quantum_algorithms/results/quantum_algorithms_summary.csv");
     assert(csv.is_open());
     std::string line;
-    std::getline(csv, line); // header
+    std::getline(csv, line);
     int count = 0;
     while (std::getline(csv, line)) {
-        if (!line.empty()) {
-            assert(line.find("PASSED") != std::string::npos);
-            count++;
-        }
+        if (!line.empty() && line.find("PASSED") != std::string::npos) count++;
     }
     assert(count == 7);
     std::cout << " PASSED (All 7 Algorithms Recorded as PASSED)\n";
 }
 
+// -----------------------------------------------------------------------------
+// Track I2 Tests (QML vs Classical Benchmark)
+// -----------------------------------------------------------------------------
+void test_qml_comparison_results() {
+    std::cout << "[Test 9] QML vs Classical Model Comparison Invariants..." << std::flush;
+    std::ifstream csv("I_quantum_algorithms/results/qml_classification_comparison.csv");
+    if (!csv.is_open()) csv.open("../I_quantum_algorithms/results/qml_classification_comparison.csv");
+    assert(csv.is_open());
+
+    std::string line;
+    std::getline(csv, line); // Header
+
+    int model_count = 0;
+    bool found_qsvm = false;
+    bool found_vqc = false;
+    bool found_rbf = false;
+    bool found_mlp = false;
+
+    while (std::getline(csv, line)) {
+        if (line.empty()) continue;
+        std::stringstream ss(line);
+        std::string token;
+        std::vector<std::string> cols;
+        while (ss.good()) {
+            if (ss.peek() == '"') {
+                ss.get();
+                std::getline(ss, token, '"');
+                if (ss.peek() == ',') ss.get();
+            } else {
+                std::getline(ss, token, ',');
+            }
+            cols.push_back(token);
+        }
+
+        if (cols.size() >= 5) {
+            model_count++;
+            std::string name = cols[0];
+            double acc = std::stod(cols[1]);
+            double t_sec = std::stod(cols[2]);
+            int params = std::stoi(cols[3]);
+            int evals = std::stoi(cols[4]);
+
+            // All models must achieve non-trivial classification accuracy > 70%
+            assert(acc >= 70.0);
+            assert(t_sec >= 0.0);
+            assert(params > 0);
+            assert(evals > 0);
+
+            if (name.find("Quantum Kernel SVM") != std::string::npos) found_qsvm = true;
+            if (name.find("Variational Quantum Classifier") != std::string::npos) found_vqc = true;
+            if (name.find("Classical RBF-Kernel SVM") != std::string::npos) found_rbf = true;
+            if (name.find("Classical Small MLP") != std::string::npos) found_mlp = true;
+        }
+    }
+
+    assert(model_count == 4);
+    assert(found_qsvm && found_vqc && found_rbf && found_mlp);
+    std::cout << " PASSED (All 4 Models Verified with Acc >= 70% on Make-Moons)\n";
+}
+
 int main() {
     std::cout << "=========================================================================\n";
-    std::cout << " Running Track I1: Quantum Algorithms & Annealing Unit Tests            \n";
+    std::cout << " Running Track I1 & I2: Quantum Algorithms & QML Benchmark Tests         \n";
     std::cout << "=========================================================================\n";
 
     test_deutsch_jozsa();
@@ -106,8 +164,9 @@ int main() {
     test_qpe_phase();
     test_shor_factorization();
     test_quantum_annealing();
-    test_summary_csv_artifacts();
+    test_i1_summary_csv();
+    test_qml_comparison_results();
 
-    std::cout << "\n>>> All Track I1 Quantum Algorithm & Annealing Tests PASSED (100% OK)! <<<\n";
+    std::cout << "\n>>> All Track I1 & I2 Tests PASSED (100% OK)! <<<\n";
     return 0;
 }
