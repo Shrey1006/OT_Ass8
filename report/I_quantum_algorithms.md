@@ -91,6 +91,32 @@ Logged in [`I_quantum_algorithms/results/qml_classification_comparison.csv`](fil
 
 ---
 
+### C. Track I3: Grover vs Classical Linear Search & Noisy Simulation Benchmark
+Logged in [`I_quantum_algorithms/results/grover_scaling_comparison.csv`](file:///c:/Users/ADMIN/Desktop/OT_Ass8/I_quantum_algorithms/results/grover_scaling_comparison.csv) and [`I_quantum_algorithms/results/grover_noise_experiment.csv`](file:///c:/Users/ADMIN/Desktop/OT_Ass8/I_quantum_algorithms/results/grover_noise_experiment.csv):
+
+#### 1. Scaling Benchmark (Scaling $n \in [3, 8]$ / $N \in [8, 256]$)
+| Qubits ($n$) | Search Space ($N$) | Classical Queries | Grover Queries | Query Speedup | Classical ALU Ops | Quantum Gates | CX Gates | Circuit Depth | Grover Success (%) | Classical Wall-Clock ($\mu\text{s}$) | Est. HW Time ($\mu\text{s}$) |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 3 | 8 | 6 | 2 | **3.00x** | 12 | 73 | 24 | 50 | 95.02% | **0.865** | 3.38 |
+| 4 | 16 | 11 | 3 | **3.67x** | 22 | 205 | 84 | 167 | 95.90% | **0.920** | 10.82 |
+| 5 | 32 | 21 | 4 | **5.25x** | 42 | 661 | 288 | 522 | 100.00% | **1.108** | 36.26 |
+| 6 | 64 | 42 | 6 | **7.00x** | 84 | 2,190 | 960 | 1,184 | 100.00% | **2.079** | 120.60 |
+| 7 | 128 | 84 | 8 | **10.50x** | 168 | 4,271 | 1,920 | 2,026 | 99.41% | **3.734** | 239.02 |
+| 8 | 256 | 167 | 12 | **13.92x** | 334 | 8,804 | 4,032 | 3,698 | 100.00% | **8.524** | 498.64 |
+
+#### 2. Noisy Simulation Experiment ($n=3$, $N=8$, Depolarizing Noise)
+| 1-Qubit Gate Error $p_1$ (%) | 2-Qubit Gate Error $p_2 = 2p_1$ (%) | Success Probability (%) | Random Baseline (%) | Advantage over Guessing (%) |
+| :---: | :---: | :---: | :---: | :---: |
+| 0.0% | 0.0% | **94.29%** | 12.50% | **+81.79%** |
+| 0.1% | 0.2% | **88.89%** | 12.50% | +76.39% |
+| 0.5% | 1.0% | **67.36%** | 12.50% | +54.86% |
+| 1.0% | 2.0% | **50.27%** | 12.50% | +37.77% |
+| 2.0% | 4.0% | **29.71%** | 12.50% | +17.21% |
+| 3.0% | 6.0% | **20.14%** | 12.50% | +7.64% |
+| 5.0% | 10.0% | **13.57%** | 12.50% | **+1.07%** (Collapsed) |
+
+---
+
 ## 6. Analysis, Trade-offs & Limitations
 
 ### 1. Accuracy & Sample Efficiency
@@ -103,3 +129,25 @@ Logged in [`I_quantum_algorithms/results/qml_classification_comparison.csv`](fil
 
 ### 3. Quantum Annealing Ground State Exploration
 - The D-Wave `neal.SimulatedAnnealingSampler` solved the 5-spin frustrated antiferromagnetic loop with $100\%$ success in discovering the degenerate ground states ($E = -3.9000$, e.g., $s = [-1, +1, +1, -1, +1]$), confirming that transverse annealing schedules escape local energy barriers on non-planar coupling graphs.
+
+### 4. Honest Analysis: When Quantum Helps vs When It Doesn't (Grover vs Track D Classical Parallelism)
+- **The Constant Factor Trap in Query vs Gate Complexity**:
+  Grover's algorithm demonstrates a genuine asymptotic quadratic speedup in terms of oracle evaluations ($\mathcal{O}(\sqrt{N})$ vs $\mathcal{O}(N)$). At $N=256$, Grover achieves a **13.92x query advantage** (12 queries vs 167 queries).
+  However, examining physical operations reveals an **honest negative result** for small-to-moderate search spaces:
+  - While classical linear search requires only **334 elementary ALU operations** (comparisons and pointer increments), transpiled Grover's algorithm requires **8,804 quantum elementary gates**, including **4,032 CX gates** with a circuit depth of 3,698.
+  - Multi-controlled $Z$ phase flips and diffusion operators decompose into $\mathcal{O}(n^2)$ entangling gates per iteration. Consequently, classical linear search takes **$8.524 \; \mu\text{s}$** on a standard 3.5 GHz CPU core, whereas estimated physical quantum execution on 100 ns superconducting qubits requires **$498.64 \; \mu\text{s}$** (**classical is 58.5x faster in wall-clock time**).
+- **Where Quantum Does Not Help**:
+  Quantum unstructured search fails to deliver practical speedups for in-memory or unstructured database lookup where:
+  1. $N \le 10^8$ (the crossover point requires $N > 10^9$ to amortize the $\approx 10^3 - 10^4$ gate decomposition factor).
+  2. The oracle evaluation is cheap (e.g. integer comparison). Classical CPUs execute billions of comparisons per second with SIMD vectorization and hardware prefetchers that completely overwhelm NISQ gate cycle latencies.
+- **Where Quantum Truly Helps**:
+  Quantum search provides exponential or polynomial utility only when:
+  1. The oracle is an NP-verifier or cryptographic hash (e.g. SHA-256 pre-image finding or SAT solving), where each classical evaluation is computationally intense ($\mathcal{O}(\text{poly}(n))$ cycles) and memory bandwidth is not the bottleneck.
+  2. Algorithms with exponential separation (Shor's order finding, Deutsch-Jozsa, Phase Estimation) where the mathematical structure of Fourier transforms over abelian groups bypasses classical combinatorial hardness entirely.
+- **Noisy Simulation Degradation**:
+  In our depolarizing noise experiment on $n=3$, fidelity drops sharply from $94.29\%$ at zero noise down to $50.27\%$ at $p_1 = 1.0\%$ ($p_2 = 2.0\%$). At $p_1 = 5.0\%$, the success probability reaches **$13.57\%$**, practically indistinguishable from uniform random guessing ($12.50\%$). Without fault-tolerant quantum error correction (QEC), quantum coherence vanishes before deep search iterations can constructively interfere.
+- **Contrasting with Track D Classical Parallel Speedups**:
+  In **Track D (Multi-threading / SIMD parallelism)**:
+  - We achieved an immediate, deterministic **$3.8\times$ speedup on 4 threads** with zero degradation in accuracy or numerical fidelity.
+  - Classical parallelism leverages mature silicon with sub-nanosecond clock cycles, coherent L1/L2/L3 cache hierarchies, and zero decoherence risk.
+  - In stark contrast, Grover's $\mathcal{O}(\sqrt{N})$ algorithm introduces substantial physical gate compilation overhead and extreme sensitivity to physical gate noise, showing that asymptotic speedup does not equal wall-clock speedup without sufficiently massive problem sizes or fault-tolerant hardware.

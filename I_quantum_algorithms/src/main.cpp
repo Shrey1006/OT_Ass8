@@ -35,9 +35,8 @@ void print_csv_table(const std::string& path, const std::string& title) {
     std::cout << "---------------------------------------------------------------------------------------------------------\n";
 
     std::string line;
-    if (!std::getline(csv, line)) return; // Header
+    if (!std::getline(csv, line)) return;
 
-    // Print rows
     while (std::getline(csv, line)) {
         if (line.empty()) continue;
         std::stringstream ss(line);
@@ -57,10 +56,10 @@ void print_csv_table(const std::string& path, const std::string& title) {
 
         if (cols.size() >= 5) {
             std::cout << std::left
-                      << std::setw(38) << cols[0]
-                      << std::setw(20) << cols[1]
+                      << std::setw(32) << cols[0]
+                      << std::setw(18) << cols[1]
                       << std::setw(16) << cols[2]
-                      << std::setw(12) << cols[3]
+                      << std::setw(16) << cols[3]
                       << cols[4]
                       << "\n";
         }
@@ -70,27 +69,33 @@ void print_csv_table(const std::string& path, const std::string& title) {
 
 int main() {
     std::cout << "========================================================================\n";
-    std::cout << " Track I: Quantum Algorithms & QML vs Classical Benchmark Suite        \n";
+    std::cout << " Track I: Complete Quantum Algorithms, QML & Grover Scaling Suite       \n";
     std::cout << "========================================================================\n\n";
 
     // 1. Run I1 Quantum Algorithms Suite
-    std::cout << "[Step 1] Executing Track I1 Quantum Algorithms Suite (Qiskit 2.6 & D-Wave Neal)...\n";
+    std::cout << "[Step 1] Executing Track I1: 6 Quantum Gate Algorithms & Annealing...\n";
     std::string out1 = exec_cmd("python3 I_quantum_algorithms/scripts/quantum_algorithms.py 2>/dev/null");
     if (out1.empty()) out1 = exec_cmd("python3 ../I_quantum_algorithms/scripts/quantum_algorithms.py 2>/dev/null");
     std::cout << out1 << "\n";
 
-    print_csv_table("I_quantum_algorithms/results/quantum_algorithms_summary.csv", 
-                    "Track I1: Quantum Gate Algorithms & Annealing Verification Summary");
-
     // 2. Run I2 QML vs Classical Classification Benchmark
-    std::cout << "\n[Step 2] Executing Track I2: QML vs Classical Models on Make-Moons...\n";
+    std::cout << "\n[Step 2] Executing Track I2: QML (QSVM, VQC) vs Classical (RBF, MLP)...\n";
     std::string out2 = exec_cmd("python3 I_quantum_algorithms/scripts/qml_benchmark.py 2>/dev/null");
     if (out2.empty()) out2 = exec_cmd("python3 ../I_quantum_algorithms/scripts/qml_benchmark.py 2>/dev/null");
     std::cout << out2 << "\n";
 
-    print_csv_table("I_quantum_algorithms/results/qml_classification_comparison.csv",
-                    "Track I2: Model Accuracy, Training Time, Parameters & Evaluations Comparison");
+    // 3. Run I3 Grover vs Classical Linear Search & Noise Experiment
+    std::cout << "\n[Step 3] Executing Track I3: Grover Scaling vs Classical & Noisy Simulation...\n";
+    std::string out3 = exec_cmd("python3 I_quantum_algorithms/scripts/grover_vs_classical.py 2>/dev/null");
+    if (out3.empty()) out3 = exec_cmd("python3 ../I_quantum_algorithms/scripts/grover_vs_classical.py 2>/dev/null");
+    std::cout << out3 << "\n";
 
-    std::cout << "\n>>> Track I1 & I2 Completed Successfully! <<<\n";
+    print_csv_table("I_quantum_algorithms/results/grover_scaling_comparison.csv",
+                    "Track I3: Grover vs Classical Query, Gate & Clock Scaling (N=8..256)");
+
+    print_csv_table("I_quantum_algorithms/results/grover_noise_experiment.csv",
+                    "Track I3: Grover Fidelity Decay under Depolarizing Noise");
+
+    std::cout << "\n>>> Track I1, I2 & I3 Completed Successfully! <<<\n";
     return 0;
 }

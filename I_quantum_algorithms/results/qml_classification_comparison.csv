@@ -1,5 +1,5 @@
 model,accuracy_pct,training_time_sec,parameter_count,circuit_or_model_evaluations
-"Quantum Kernel SVM (QSVM)",76.67,0.094,41,170
-"Variational Quantum Classifier (VQC)",80.0,6.2997,6,11550
-"Classical RBF-Kernel SVM",93.33,0.0015,29,4515
-"Classical Small MLP (9 Params)",83.33,0.0802,9,21000
+"Quantum Kernel SVM (QSVM)",76.67,0.2288,41,170
+"Variational Quantum Classifier (VQC)",80.0,13.2488,6,11550
+"Classical RBF-Kernel SVM",93.33,0.0032,29,4515
+"Classical Small MLP (9 Params)",83.33,0.3449,9,35000

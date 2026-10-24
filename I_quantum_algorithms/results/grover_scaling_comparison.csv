@@ -1,0 +1,7 @@
+n_qubits,search_space_N,classical_queries,grover_queries,query_speedup,classical_alu_ops,quantum_gates,cx_gates,circuit_depth,grover_success_pct,classical_wall_clock_us,simulated_quantum_ms,est_physical_hardware_us
+3,8,6,2,3.0,12,73,24,50,95.12,0.369,38.21,3.38
+4,16,11,3,3.67,22,205,84,167,95.31,0.903,29.74,10.82
+5,32,21,4,5.25,42,661,288,522,100.0,2.033,33.12,36.26
+6,64,42,6,7.0,84,2190,960,1184,99.51,2.368,163.0,120.6
+7,128,84,8,10.5,168,4271,1920,2026,99.32,6.089,320.57,239.02
+8,256,167,12,13.92,334,8804,4032,3698,100.0,10.599,383.27,498.64

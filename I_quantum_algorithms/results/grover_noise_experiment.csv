@@ -1,0 +1,8 @@
+one_qubit_noise_pct,two_qubit_noise_pct,success_probability_pct,random_guess_baseline_pct,fidelity_advantage_pct
+0.0,0.0,94.58,12.5,82.08
+0.1,0.2,87.74,12.5,75.24
+0.5,1.0,69.02,12.5,56.52
+1.0,2.0,50.54,12.5,38.04
+2.0,4.0,30.69,12.5,18.19
+3.0,6.0,20.02,12.5,7.52
+5.0,10.0,13.79,12.5,1.29

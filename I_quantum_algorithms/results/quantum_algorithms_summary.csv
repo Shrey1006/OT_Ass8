@@ -1,7 +1,7 @@
 algorithm,oracle_type,qubits,status,key_metric
 "Deutsch-Jozsa","Constant & Balanced",4,PASSED,"100% Deterministic Discrimination"
 "Bernstein-Vazirani (Manual Gates)","Hidden String s=1011",5,PASSED,"Recovered 1011 (1 Shot)"
-"Grover's Search (Manual Gates)","Marked State |101>",3,PASSED,"P(success)=94.5% (Quadratic Speedup)"
+"Grover's Search (Manual Gates)","Marked State |101>",3,PASSED,"P(success)=94.8% (Quadratic Speedup)"
 "Quantum Fourier Transform (QFT)","Basis State |5>",3,PASSED,"Exact Unitarity QFT^dag * QFT = I"
 "Quantum Phase Estimation (QPE)","Phase theta=3/8",4,PASSED,"Exact Phase 0.011_2"
 "Shor's Algorithm (Order Finding)","Factor N=15 (a=7)",8,PASSED,"Factors: 3 x 5 = 15"
