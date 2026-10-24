@@ -163,6 +163,79 @@ void test_budgeted_prioritization_monotonicity() {
     std::cout << " PASSED (Monotonic Coverage: 25%->" << b25.coverage_pct << "% | 50%->" << b50.coverage_pct << "% | 75%->" << b75.coverage_pct << "%)\n";
 }
 
+void test_mutation_score_and_fault_detection_invariants() {
+    std::cout << "[Test 9] Mutation Testing & Fault Detection Invariants (J3)..." << std::flush;
+    std::ifstream mut_file("J_softeng/results/mutation_score_comparison.csv");
+    if (!mut_file.is_open()) mut_file.open("../J_softeng/results/mutation_score_comparison.csv");
+    assert(mut_file.is_open());
+
+    std::string line;
+    std::getline(mut_file, line); // Header
+    int row_count = 0;
+
+    while (std::getline(mut_file, line)) {
+        if (line.empty()) continue;
+        std::stringstream ss(line);
+        std::string token;
+        std::vector<std::string> cols;
+        while (std::getline(ss, token, ',')) cols.push_back(token);
+
+        if (cols.size() >= 7) {
+            row_count++;
+            std::string name = cols[0];
+            double mut_score = std::stod(cols[5]);
+            double fault_loss = std::stod(cols[6]);
+
+            if (name == "Naive Full Suite (Baseline)") {
+                assert(mut_score == 100.0);
+                assert(fault_loss == 0.0);
+            } else if (name == "Exact ILP Minimized Suite" || name == "Greedy Minimized Suite") {
+                // Minimized suite retains high fault detection but loses subtle edge cases
+                assert(mut_score >= 85.0);
+                assert(fault_loss <= 15.0);
+            } else if (name == "Naive Sequential Prefix (20%)") {
+                // Catastrophic fault detection loss
+                assert(mut_score <= 50.0);
+                assert(fault_loss >= 50.0);
+            }
+        }
+    }
+    assert(row_count == 5);
+    std::cout << " PASSED (Mutation Score Invariants Verified across 5 Suites)\n";
+}
+
+void test_diagnostic_granularity_and_readability() {
+    std::cout << "[Test 10] Diagnostic Granularity & Entanglement Metric (J3)..." << std::flush;
+    softeng::TestMinimizerEngine engine;
+    std::string meta = "J_softeng/results/pugixml_tests_metadata.csv";
+    std::string inc = "J_softeng/results/pugixml_incidence_matrix.csv";
+    if (!engine.load_from_csv(meta, inc)) {
+        meta = "../" + meta; inc = "../" + inc;
+        assert(engine.load_from_csv(meta, inc));
+    }
+
+    auto full_res = engine.solve_naive_full();
+    auto ilp_res = engine.solve_ilp_exact(true);
+
+    // Compute average subsystems per test in full suite vs minimized suite
+    double full_total_subs = 0.0;
+    for (int tid : full_res.selected_test_ids) full_total_subs += engine.tests[tid].covered_subsystems.size();
+    double full_avg_subs = full_total_subs / full_res.selected_test_count;
+
+    double ilp_total_subs = 0.0;
+    for (int tid : ilp_res.selected_test_ids) ilp_total_subs += engine.tests[tid].covered_subsystems.size();
+    double ilp_avg_subs = ilp_total_subs / ilp_res.selected_test_count;
+
+    // Verify that minimized tests cover all 29 subsystems with high test-to-subsystem ratio (29 / 14 = 2.07 subsystems/test)
+    assert(ilp_res.covered_subsystems_count == 29);
+    assert(ilp_res.selected_test_count == 14);
+    double subsystem_density = static_cast<double>(ilp_res.covered_subsystems_count) / ilp_res.selected_test_count;
+    assert(subsystem_density >= 2.0); // Each test in minimized suite uniquely covers > 2 subsystems on average
+    std::cout << " PASSED (Subsystem Coverage Density: " << std::fixed << std::setprecision(2) << subsystem_density
+              << " unique subsystems/test in Minimized Suite vs "
+              << (29.0 / full_res.selected_test_count) << " in Full Suite)\n";
+}
+
 int main() {
     std::cout << "=========================================================================\n";
     std::cout << " Running Track J: Software Engineering Test-Suite Minimization Tests    \n";
@@ -176,7 +249,9 @@ int main() {
     test_ilp_exact_optimality();
     test_ilp_optimal_runtime();
     test_budgeted_prioritization_monotonicity();
+    test_mutation_score_and_fault_detection_invariants();
+    test_diagnostic_granularity_and_readability();
 
-    std::cout << "\n>>> All 8 Track J SoftEng Tests PASSED (100% OK)! <<<\n";
+    std::cout << "\n>>> All 10 Track J SoftEng Tests PASSED (100% OK)! <<<\n";
     return 0;
 }

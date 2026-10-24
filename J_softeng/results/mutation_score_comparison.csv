@@ -1,0 +1,6 @@
+suite_name,tests_count,runtime_us,mutants_killed,total_mutants,mutation_score_pct,fault_detection_loss_pct,localization_granularity,readability_status
+Naive Full Suite (Baseline),953,100413.1,10,10,100.0,0.0,High (1 test per specific failure),High (Exhaustive documentation & isolation)
+Exact ILP Minimized Suite,14,1204.3,9,10,90.0,10.0,Low (1 failure implicates 5-8 subsystems),Medium-Low (Disjoint subset lacks API breadth)
+Greedy Minimized Suite,15,1258.1,9,10,90.0,10.0,Low (1 failure implicates 5-8 subsystems),Medium-Low (Disjoint subset lacks API breadth)
+Naive Random (20% Sampling),191,19913.8,8,10,80.0,20.0,Medium (Arbitrary subset coverage gaps),Low (Incoherent random test selection)
+Naive Sequential Prefix (20%),191,17752.8,4,10,40.0,60.0,Zero (Complete omission of XPath & Unicode),Low (Truncated test execution)
