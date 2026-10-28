@@ -113,6 +113,15 @@ Testing optimizer join-order sensitivity and subquery restructuring on Q03:
 
 ---
 
+### D. Visualizations & Empirical Plots
+
+#### Figure H.1: TPC-H Query Latency and Knapsack Index Selection Benefit Curve
+![Figure H.1: TPC-H Query Latency and Knapsack Index Selection Benefit Curve](../H_dbms/results/tpch_index_performance.png)
+- *Panel (a) Query Latency: Baseline vs Indexed*: Evaluates 8 official TPC-H decision-support queries. Secondary indexes achieve dramatic accelerations on selective filter queries (16.59x speedup on Q19, 2.09x on Q01, 1.96x on Q14), reducing total 8-query workload latency from 1,794.41 ms to 1,137.40 ms ($1.58\times$ total speedup).
+- *Panel (b) Knapsack Index Selection Curve*: Evaluates cumulative query planner benefit across disk storage budgets ($1\text{ MB} \dots 25\text{ MB}$). Exact ILP / Branch-and-Bound discovers the optimal 11-index set within 17.5 MB.
+
+---
+
 ## 6. Analysis, Trade-offs & Limitations
 
 ### 1. The Power of Indexing Selective Predicates (Q19, Q14, Q01)
@@ -127,3 +136,20 @@ Testing optimizer join-order sensitivity and subquery restructuring on Q03:
 - For $m$ tables, the space of possible join trees is $\frac{(2m-2)!}{(m-1)!}$ (catalan tree topologies $\times$ permutations). 
 - For $m \le 8$, PostgreSQL dynamic programming join search (`join_collapse_limit = 8`) exhaustively finds the optimal plan. 
 - For larger queries, the early-filtering CTE pattern (demonstrated in Config C) manually prunes intermediate cross-product cardinalities, achieving a **1.62x** improvement over the default engine plan.
+
+---
+
+## 7. Links to Code and Results
+- **Source Code**:
+  - Index Selection Solvers (Greedy, DP, ILP BnB): [`H_dbms/src/index_selection.hpp`](../H_dbms/src/index_selection.hpp)
+  - Join Order & Query Rewrite Testbed: [`H_dbms/src/tpch_benchmark.cpp`](../H_dbms/src/tpch_benchmark.cpp)
+  - Automated PostgreSQL EXPLAIN & Checksum Verifier: [`H_dbms/scripts/run_tpch_benchmark.py`](../H_dbms/scripts/run_tpch_benchmark.py)
+  - Unit Tests: [`H_dbms/tests/test_main.cpp`](../H_dbms/tests/test_main.cpp)
+- **Empirical Results Files**:
+  - TPC-H 8-Query Latency & Checksum Table: [`H_dbms/results/tpch_latency_comparison.csv`](../H_dbms/results/tpch_latency_comparison.csv)
+  - Knapsack Index Selection Scaling: [`H_dbms/results/index_selection_comparison.csv`](../H_dbms/results/index_selection_comparison.csv)
+  - Join Order & CTE Rewrite Data: [`H_dbms/results/join_order_experiment.csv`](../H_dbms/results/join_order_experiment.csv)
+  - PostgreSQL Table & Index Storage Breakdown: [`H_dbms/results/tpch_storage_breakdown.csv`](../H_dbms/results/tpch_storage_breakdown.csv)
+  - Generated DBMS Benchmark Plot: [`H_dbms/results/tpch_index_performance.png`](../H_dbms/results/tpch_index_performance.png)
+- **Status Categorization**:
+  - Measured on Hardware: PostgreSQL 16.15 running natively under WSL2 Linux on NVMe SSD with live `pg_relation_size()` measurement and MD5 checksum validation.

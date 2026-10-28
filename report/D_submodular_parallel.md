@@ -142,6 +142,13 @@ Source: [`multitask_benchmark.csv`](file:///c:/Users/ADMIN/Desktop/OT_Ass8/D_sub
 | **MGDA (Sener-Koltun)** | $0.1879 \pm 0.0632$ | $0.4994 \pm 0.3006$ | $0.6873 \pm 0.2889$ | $-0.2281 \pm 0.3995$ | $82.57\text{ ms}$ |
 | **GradNorm (Chen et al.)**| **$0.1590 \pm 0.0267$** | **$0.3069 \pm 0.0768$** | **$0.4659 \pm 0.0911$** | **$-0.6570 \pm 0.2072$** | **$55.81\text{ ms}$** |
 
+### 5.6 Visualizations & Empirical Plots
+
+#### Figure D.1: Multicore Parallel Scaling & Federated Averaging Convergence
+![Figure D.1: Multicore Parallel Scaling & Federated Averaging Convergence](../D_submodular_parallel/results/parallel_fedavg_scaling.png)
+- *Panel (a) Strong Scaling vs Theoretical Bounds*: OpenMP Static matches Amdahl's Law closely up to 4 threads ($3.81\times$ speedup, $95.1\%$ parallel efficiency). Beyond 4 threads, core oversubscription on 4 logical processors plateaus speedup at $3.35\times$.
+- *Panel (b) Federated Learning Convergence*: Under IID data, FedAvg converges smoothly to the centralized baseline loss ($0.4217$) within 25 communication rounds ($R=25, E=20$). Under non-IID label skew, client drift delays initial convergence but reaches parity by round 25 with $99.8\%$ communication payload reduction.
+
 ---
 
 ## 6. Analysis, Trade-offs & Honest Limitations
@@ -168,3 +175,19 @@ Source: [`multitask_benchmark.csv`](file:///c:/Users/ADMIN/Desktop/OT_Ass8/D_sub
 - **All Runtimes & Losses**: Measured directly on hardware (WSL2 Ubuntu 24.04 x86_64, `std::chrono::steady_clock`).
 - **Exact Benchmarks**: Submodular brute-force and Centralized SGD verified deterministically.
 - **Multi-Task Runs**: Formally evaluated over 10 independent random seeds reporting Mean $\pm$ Std.
+
+---
+
+## 8. Links to Code and Results
+- **Source Code**:
+  - Submodular Maximum Coverage: [`D_submodular_parallel/src/submodular_max_coverage.hpp`](../D_submodular_parallel/src/submodular_max_coverage.hpp)
+  - Multicore Parallel Workloads: [`D_submodular_parallel/src/parallel_monte_carlo.hpp`](../D_submodular_parallel/src/parallel_monte_carlo.hpp)
+  - Federated Averaging Simulator: [`D_submodular_parallel/src/fedavg_simulation.hpp`](../D_submodular_parallel/src/fedavg_simulation.hpp)
+  - Multi-Task Optimization (MGDA & GradNorm): [`D_submodular_parallel/src/multitask_optimization.hpp`](../D_submodular_parallel/src/multitask_optimization.hpp)
+  - Unit Tests: [`D_submodular_parallel/tests/test_main.cpp`](../D_submodular_parallel/tests/test_main.cpp)
+- **Empirical Results Files**:
+  - Multicore Parallel Scaling: [`D_submodular_parallel/results/parallel_scaling_benchmark.csv`](../D_submodular_parallel/results/parallel_scaling_benchmark.csv)
+  - Workload Granularity & Overhead: [`D_submodular_parallel/results/overhead_breakdown.csv`](../D_submodular_parallel/results/overhead_breakdown.csv)
+  - Federated Averaging Convergence: [`D_submodular_parallel/results/fedavg_benchmark.csv`](../D_submodular_parallel/results/fedavg_benchmark.csv)
+  - Multi-Task Optimization Loss Log: [`D_submodular_parallel/results/multitask_benchmark.csv`](../D_submodular_parallel/results/multitask_benchmark.csv)
+  - Generated Scaling Plot: [`D_submodular_parallel/results/parallel_fedavg_scaling.png`](../D_submodular_parallel/results/parallel_fedavg_scaling.png)

@@ -89,18 +89,25 @@ Logged in [`J_softeng/results/test_suite_minimization.csv`](file:///c:/Users/ADM
 | **Naive Sequential Prefix (20%)** | 191 / 953 | 80.0% | 17,752.8 | 82.3% | 5.65x | 12 / 29 | **41.4%** *(Severe Defect)* |
 | **Greedy (Unweighted Set Cover)**| **15** / 953 | **98.4%** | 1,258.1 | 98.7% | **79.8x** | 29 / 29 | **100.0%** |
 | **Greedy (Time-Weighted Set Cover)**| **15** / 953 | **98.4%** | 1,258.1 | 98.7% | **79.8x** | 29 / 29 | **100.0%** |
-| **Exact ILP (Minimum Test Count)**| **14** / 953 | **98.5%** | 1,567.0 | 98.4% | 64.0x | 29 / 29 | **100.0%** |
-| **Exact ILP (Optimal Runtime)** | **14** / 953 | **98.5%** | **1,204.3** | **98.8%** | **83.3x** | 29 / 29 | **100.0%** |
+| **Exact ILP (Minimum Test Count)**| **14** / 953 | **98.5%** | 1,567.0 | 98.4% | 64.08x | 29 / 29 | **100.0%** |
+| **Exact ILP (Optimal Runtime)** | **14** / 953 | **98.5%** | **1,204.3** | **98.8%** | **83.38x** | 29 / 29 | **100.0%** |
 | **Budgeted Prioritization (25% Time)**| 284 / 953 | 70.2% | 25,095.3 | 75.0% | 4.00x | 29 / 29 | **100.0%** |
 | **Budgeted Prioritization (50% Time)**| 575 / 953 | 39.7% | 50,206.1 | 50.0% | 2.00x | 29 / 29 | **100.0%** |
 | **Budgeted Prioritization (75% Time)**| 766 / 953 | 19.6% | 75,306.4 | 25.0% | 1.33x | 29 / 29 | **100.0%** |
+
+### Visualizations & Empirical Plots
+
+#### Figure J.1: Software Engineering Test-Suite Minimization and Mutation Score Retention
+![Figure J.1: Software Engineering Test-Suite Minimization and Mutation Score Retention](../J_softeng/results/test_suite_minimization_plots.png)
+- *Panel (a) Test Suite Count and Execution Speedup*: Exact 0-1 ILP reduces test count from 953 to 14 ($98.53\%$ reduction) and slashes execution latency from 100.41 ms to 1.20 ms, achieving an empirical **$83.38\times$ wall-clock speedup**.
+- *Panel (b) Subsystem Coverage vs Mutation Defect Retention*: Retaining 100% subsystem coverage (29/29) yields a 90% mutation score (10% defect escape rate), while naive random (93.1% coverage, 80% mutation) and sequential prefix (41.4% coverage, 40% mutation) suffer severe defect blind spots.
 
 ---
 
 ## 6. Analysis, Trade-offs & Limitations
 
 ### 1. Speedup vs Coverage Retention
-- **Exact ILP Optimal Runtime** reduced total test execution from **953 tests down to 14 tests** ($98.5\%$ reduction), dropping execution time from **$100.41 \; \text{ms}$ to $1.20 \; \text{ms}$** (**83.3x speedup**).
+- **Exact ILP Optimal Runtime** reduced total test execution from **953 tests down to 14 tests** ($98.53\%$ reduction), dropping execution time from **$100.41 \; \text{ms}$ ($100,413.08 \; \mu\text{s}$) to $1.20 \; \text{ms}$ ($1,204.28 \; \mu\text{s}$)** (**83.38x speedup**).
 - Coverage retention is **$100.0\%$**: all 29 core architectural subsystems in `pugixml.cpp` remain fully verified.
 
 ### 2. Defect in Naive Heuristics
@@ -150,3 +157,21 @@ Logged in [`J_softeng/results/test_suite_minimization.csv`](file:///c:/Users/ADM
 To reconcile the 83.4x speedup gain with the 10.0% mutation detection risk:
 - **Tier 1 (Pre-Commit / PR Push)**: Run the **Exact ILP Minimized Suite (14 tests, 1.2 ms)** for instantaneous feedback.
 - **Tier 2 (Nightly / Release Merge)**: Run the **Full Regression Suite (953 tests, 100 ms)** for exhaustive defect prevention and living documentation validation.
+
+---
+
+## 7. Links to Code and Results
+- **Source Code**:
+  - Test-Suite Minimizer (Greedy & Exact ILP): [`J_softeng/src/minimizer.hpp`](../J_softeng/src/minimizer.hpp)
+  - Unit Test Invariants: [`J_softeng/tests/test_main.cpp`](../J_softeng/tests/test_main.cpp)
+  - Coverage & Incidence Extractor: [`J_softeng/scripts/extract_coverage.py`](../J_softeng/scripts/extract_coverage.py)
+  - Mutation Testing Framework: [`J_softeng/scripts/mutation_analysis.py`](../J_softeng/scripts/mutation_analysis.py)
+  - Profiled `pugixml` Engine: [`J_softeng/pugixml/src/pugixml.cpp`](../J_softeng/pugixml/src/pugixml.cpp)
+- **Empirical Results Files**:
+  - Test-Suite Minimization Benchmark: [`J_softeng/results/test_suite_minimization.csv`](../J_softeng/results/test_suite_minimization.csv)
+  - Mutation Score Comparison: [`J_softeng/results/mutation_score_comparison.csv`](../J_softeng/results/mutation_score_comparison.csv)
+  - Binary Incidence Matrix ($29 \times 953$): [`J_softeng/results/pugixml_incidence_matrix.csv`](../J_softeng/results/pugixml_incidence_matrix.csv)
+  - Test Case Metadata ($n=953$): [`J_softeng/results/pugixml_tests_metadata.csv`](../J_softeng/results/pugixml_tests_metadata.csv)
+  - Generated Test Minimization Plot: [`J_softeng/results/test_suite_minimization_plots.png`](../J_softeng/results/test_suite_minimization_plots.png)
+- **Status Categorization**:
+  - Measured on Hardware: GCC 13.3.0 `-O2` compiled `pugixml` executed natively on AMD64 Linux WSL2 with monotonic clock timing and `gcov`/`gprof` profiling.

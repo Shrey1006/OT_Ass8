@@ -104,19 +104,22 @@ All values are transcribed directly from [`benchmark_summary.csv`](file:///c:/Us
 
 ## 5. Visualizations & Figures Referenced
 
-1. **[Figure 1: Convergence Curves across Landscape Topologies](file:///c:/Users/ADMIN/Desktop/OT_Ass8/A_continuous/results/convergence_convex_vs_nonconvex_vs_saddle.png)**:
-   - *Panel (a) Convex Quadratic*: All algorithms rapidly reach numerical zero; GD reaches $1.64 \times 10^{-11}$ in 20 iterations.
-   - *Panel (b) Strongly Convex ($\kappa = 100$)*: Standard GD exhibits extreme horizontal oscillation, stalling at $1.94 \times 10^{-4}$ after 500 iterations. In contrast, NAG and Adam descend monotonically along the valley, achieving loss $< 10^{-11}$ in under 200 iterations.
-   - *Panel (c) Rosenbrock Valley*: GD crawls along the valley floor ($f = 0.3087$). Adam's coordinate-wise adaptive step sizes navigate the curvature, achieving $3.08 \times 10^{-5}$.
-   - *Panel (d) Saddle Point ($x^2 - y^2$)*: Demonstrates unbounded descent along the negative eigenvalue direction towards $-\infty$. Momentum accelerates divergence ($10^{283}$ within 500 steps), whereas AdaGrad's cumulative sum-of-squares gracefully dampens the step sizes, containing descent to $-979.66$.
+### Figure 1: Convergence Curves across Landscape Topologies
+![Figure 1: Convergence Curves across Landscape Topologies](../A_continuous/results/convergence_convex_vs_nonconvex_vs_saddle.png)
+- *Panel (a) Convex Quadratic*: All algorithms rapidly reach numerical zero; GD reaches $1.64 \times 10^{-11}$ in 20 iterations.
+- *Panel (b) Strongly Convex ($\kappa = 100$)*: Standard GD exhibits extreme horizontal oscillation, stalling at $1.94 \times 10^{-4}$ after 500 iterations. In contrast, NAG and Adam descend monotonically along the valley, achieving loss $< 10^{-11}$ in under 200 iterations.
+- *Panel (c) Rosenbrock Valley*: GD crawls along the valley floor ($f = 0.3087$). Adam's coordinate-wise adaptive step sizes navigate the curvature, achieving $3.08 \times 10^{-5}$ at 500 iterations.
+- *Panel (d) Saddle Point ($x^2 - y^2$)*: Demonstrates unbounded descent along the negative eigenvalue direction towards $-\infty$. Momentum accelerates divergence ($10^{283}$ within 500 steps), whereas AdaGrad's cumulative sum-of-squares gracefully dampens the step sizes, containing descent to $-979.66$.
 
-2. **[Figure 2: Learning Rate Sensitivity Grid](file:///c:/Users/ADMIN/Desktop/OT_Ass8/A_continuous/results/learning_rate_sensitivity.png)**:
-   - Illustrates the stability boundary for GD: learning rates $\eta \ge 0.05$ on the $\kappa = 100$ quadratic lead to catastrophic divergence ($f \to \infty$).
-   - Adaptive methods (RMSProp, Adam) tolerate a substantially broader range of $\eta \in [0.01, 0.5]$ without divergence.
+### Figure 2: Learning Rate Sensitivity Grid
+![Figure 2: Learning Rate Sensitivity Grid](../A_continuous/results/learning_rate_sensitivity.png)
+- Illustrates the stability boundary for GD: learning rates $\eta \ge 0.05$ on the $\kappa = 100$ quadratic lead to catastrophic divergence ($f \to \infty$).
+- Adaptive methods (RMSProp, Adam) tolerate a substantially broader range of $\eta \in [0.01, 0.5]$ without divergence.
 
-3. **[Figure 3: Noise Resilience Comparison](file:///c:/Users/ADMIN/Desktop/OT_Ass8/A_continuous/results/noisy_gradient_comparison.png)**:
-   - Compares the empirical Mean $\pm$ Standard Deviation across 10 stochastic seeds.
-   - On Rosenbrock, GD exhibits high variance ($0.712 \pm 0.266$), whereas Momentum ($0.0018 \pm 0.0001$) and Adam ($0.00007 \pm 0.00007$) exhibit remarkable stability under noisy gradient evaluations.
+### Figure 3: Noise Resilience Comparison
+![Figure 3: Noise Resilience Comparison](../A_continuous/results/noisy_gradient_comparison.png)
+- Compares the empirical Mean $\pm$ Standard Deviation across 10 stochastic seeds.
+- On Rosenbrock, GD exhibits high variance ($0.712 \pm 0.266$), whereas Momentum ($0.0018 \pm 0.0001$) and Adam ($0.00007 \pm 0.00007$) exhibit remarkable stability under noisy gradient evaluations.
 
 ---
 
@@ -138,3 +141,19 @@ All values are transcribed directly from [`benchmark_summary.csv`](file:///c:/Us
 5. **Noisy Gradient Degradation on RMSProp**:
    - *Data Evidence*: On the ill-conditioned quadratic, clean RMSProp reached $4.32 \times 10^{-15}$, but under noise $\sigma = 0.05$ degraded to loss $3.151 \pm 0.067$.
    - *Root Cause*: RMSProp lacks first-moment momentum filtering; high-frequency gradient noise directly perturbs the parameter step. In contrast, Adam combines first-moment averaging ($m_t$) with second moments ($v_t$), maintaining a noisy loss of $0.00096 \pm 0.00103$.
+
+---
+
+## 7. Links to Code and Results
+- **Source Code**:
+  - Optimizers & First-Order Updates: [`A_continuous/src/optimizers.hpp`](../A_continuous/src/optimizers.hpp)
+  - Second-Order Newton & L-BFGS: [`A_continuous/src/second_order.hpp`](../A_continuous/src/second_order.hpp)
+  - 2-Layer Neural Network & Backprop: [`A_continuous/src/neural_net.hpp`](../A_continuous/src/neural_net.hpp)
+  - Landscape Objectives: [`A_continuous/src/objectives.hpp`](../A_continuous/src/objectives.hpp)
+  - Unit Tests: [`A_continuous/tests/test_main.cpp`](../A_continuous/tests/test_main.cpp)
+- **Empirical Results Files**:
+  - Full Benchmark Summary: [`A_continuous/results/benchmark_summary.csv`](../A_continuous/results/benchmark_summary.csv)
+  - Trajectory Step Logs: [`A_continuous/results/convergence_trajectories.csv`](../A_continuous/results/convergence_trajectories.csv)
+  - Learning Rate Grid: [`A_continuous/results/lr_sensitivity.csv`](../A_continuous/results/lr_sensitivity.csv)
+- **Status Categorization**:
+  - Measured on Physical Hardware: Intel Core i3-1005G1 CPU, GCC `-O3` compiled C++17 binary.

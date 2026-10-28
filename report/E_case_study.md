@@ -155,6 +155,13 @@ LNS (Mean):       |====================    | $1,100.21 (-6.0%)
 LNS (Best Run):   |==================      | $1,046.47 (-10.6%)
 ```
 
+### 5.3 Visualizations & Route Topologies
+
+#### Figure E.1: EV-VRPTW Fleet Operating Cost and Optimized Vehicle Routes
+![Figure E.1: EV-VRPTW Fleet Operating Cost and Optimized Vehicle Routes](../E_case_study/results/ev_vrptw_comparison.png)
+- *Panel (a) Fleet Operating Cost*: Large Neighborhood Search achieves a 10.6% cost reduction on its best run ($1,046.47) and a 44.4% mean tardiness reduction (slashed from 68.21 hours to 37.91 hours) over the greedy baseline.
+- *Panel (b) Optimized LNS Vehicle Routes*: Illustrates the 4 active vehicle delivery tours originating from the central depot (50, 50), covering all 25 customers and integrating intermediate fast-charging waypoints while maintaining 100% time-window and battery feasibility.
+
 ---
 
 ## 6. Analysis: Impact of Scale, Data, and Hardware Shifts
@@ -238,3 +245,20 @@ flowchart TD
 - **Formulation & Strategy Table**: Theoretical derivation.
 - **Benchmark Instance & Physical Equations**: Simulated Solomon benchmark topology using empirical EV battery consumption coefficients.
 - **Runtime & Solution Quality**: Directly measured on x86_64 CPU hardware running Ubuntu 24.04 WSL with steady-clock nanosecond profiling.
+
+---
+
+## 8. Links to Code and Results
+- **Source Code**:
+  - Problem Formulations & Data Structures: [`E_case_study/src/vrptw_problem.hpp`](../E_case_study/src/vrptw_problem.hpp)
+  - Solomon Benchmark Generator: [`E_case_study/src/solomon_generator.hpp`](../E_case_study/src/solomon_generator.hpp)
+  - Baseline Nearest Neighbor: [`E_case_study/src/baseline_greedy.hpp`](../E_case_study/src/baseline_greedy.hpp)
+  - Simulated Annealing Multi-Operator: [`E_case_study/src/simulated_annealing.hpp`](../E_case_study/src/simulated_annealing.hpp)
+  - Large Neighborhood Search (LNS): [`E_case_study/src/large_neighborhood_search.hpp`](../E_case_study/src/large_neighborhood_search.hpp)
+  - Unit Tests: [`E_case_study/tests/test_main.cpp`](../E_case_study/tests/test_main.cpp)
+- **Empirical Results Files**:
+  - Benchmark Strategy Comparison: [`E_case_study/results/strategy_comparison.csv`](../E_case_study/results/strategy_comparison.csv)
+  - Baseline Solution JSON: [`E_case_study/results/baseline_solution_rc25.json`](../E_case_study/results/baseline_solution_rc25.json)
+  - Best LNS Solution JSON: [`E_case_study/results/best_lns_solution.json`](../E_case_study/results/best_lns_solution.json)
+  - Benchmark Instance Definition: [`E_case_study/results/instance_rc25.json`](../E_case_study/results/instance_rc25.json)
+  - Generated Route Comparison Plot: [`E_case_study/results/ev_vrptw_comparison.png`](../E_case_study/results/ev_vrptw_comparison.png)

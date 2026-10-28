@@ -117,6 +117,15 @@ Logged in [`I_quantum_algorithms/results/grover_scaling_comparison.csv`](file://
 
 ---
 
+### D. Visualizations & Empirical Plots
+
+#### Figure I.1: Grover Search Query Scaling and QML Classification Accuracy
+![Figure I.1: Grover Search Query Scaling and QML Classification Accuracy](../I_quantum_algorithms/results/grover_qml_benchmark.png)
+- *Panel (a) Query Scaling Advantage*: Grover's search demonstrates asymptotic quadratic reduction in queries ($O(\sqrt{N})$ vs $O(N/2)$) as qubit register size grows from $n=3$ ($N=8$) to $n=8$ ($N=256$).
+- *Panel (b) QML Classification Accuracy*: Compares test set accuracy on the non-linear `make_moons` dataset. Classical RBF-SVM achieves 93.3% and Classical MLP 83.3%, while Variational Quantum Classifier (VQC) achieves 80.0% with only 6 parameters, and Quantum Kernel SVM (QSVM) achieves 76.7%.
+
+---
+
 ## 6. Analysis, Trade-offs & Limitations
 
 ### 1. Accuracy & Sample Efficiency
@@ -151,3 +160,21 @@ Logged in [`I_quantum_algorithms/results/grover_scaling_comparison.csv`](file://
   - We achieved an immediate, deterministic **$3.8\times$ speedup on 4 threads** with zero degradation in accuracy or numerical fidelity.
   - Classical parallelism leverages mature silicon with sub-nanosecond clock cycles, coherent L1/L2/L3 cache hierarchies, and zero decoherence risk.
   - In stark contrast, Grover's $\mathcal{O}(\sqrt{N})$ algorithm introduces substantial physical gate compilation overhead and extreme sensitivity to physical gate noise, showing that asymptotic speedup does not equal wall-clock speedup without sufficiently massive problem sizes or fault-tolerant hardware.
+
+---
+
+## 7. Links to Code and Results
+- **Source Code**:
+  - Quantum Gate Circuits (DJ, BV, QFT, QPE, Shor, Annealer): [`I_quantum_algorithms/scripts/quantum_algorithms.py`](../I_quantum_algorithms/scripts/quantum_algorithms.py)
+  - Grover vs Linear Search & Noise: [`I_quantum_algorithms/scripts/grover_vs_classical.py`](../I_quantum_algorithms/scripts/grover_vs_classical.py)
+  - QML vs Classical Benchmark: [`I_quantum_algorithms/scripts/qml_benchmark.py`](../I_quantum_algorithms/scripts/qml_benchmark.py)
+  - Unit Tests: [`I_quantum_algorithms/tests/test_main.cpp`](../I_quantum_algorithms/tests/test_main.cpp)
+- **Empirical Results Files**:
+  - Grover Query & Depth Scaling: [`I_quantum_algorithms/results/grover_scaling_comparison.csv`](../I_quantum_algorithms/results/grover_scaling_comparison.csv)
+  - Grover Gate Noise Experiment: [`I_quantum_algorithms/results/grover_noise_experiment.csv`](../I_quantum_algorithms/results/grover_noise_experiment.csv)
+  - QML vs Classical Classification: [`I_quantum_algorithms/results/qml_classification_comparison.csv`](../I_quantum_algorithms/results/qml_classification_comparison.csv)
+  - Quantum Algorithms Verification Log: [`I_quantum_algorithms/results/quantum_algorithms_summary.csv`](../I_quantum_algorithms/results/quantum_algorithms_summary.csv)
+  - Generated Empirical Plot: [`I_quantum_algorithms/results/grover_qml_benchmark.png`](../I_quantum_algorithms/results/grover_qml_benchmark.png)
+- **Status Categorization**:
+  - All Quantum Algorithms & Noise Runs: `[SIMULATED via Qiskit 2.6 Aer Statevector & Noise Models]`
+  - Classical Linear Search & Classical SVM/MLP: `[MEASURED on Physical x86_64 CPU Hardware]`

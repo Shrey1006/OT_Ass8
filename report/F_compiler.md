@@ -60,7 +60,30 @@
 
 - **Spill Reduction**: Exact BnB reduced spills by **$23.8\%$** over Greedy Kempe (saving 5 spilled variables, notably in `p08_fibonacci` and `p15_sum_of_squares`).
 
+### Visualizations & Empirical Plots
+
+#### Figure F.1: Compiler IR Optimization Passes and Register Allocation Spills
+![Figure F.1: Compiler IR Optimization Passes and Register Allocation Spills](../F_compiler/results/compiler_optimization_benchmark.png)
+- *Panel (a) Instruction Count Reduction*: Constant folding, dead code elimination, strength reduction, copy propagation, and CSE reduce static TAC instructions by 21.9% overall (up to -75.0% on arithmetic benchmarks).
+- *Panel (b) Register Allocation Spills*: Exact DSATUR Branch-and-Bound graph coloring cuts memory spills by 23.8% (16 spills vs 21 spills for Greedy Kempe across 15 programs).
+
+---
+
 ## 6. Analysis, Trade-offs & Limitations
 - **Speed vs. Accuracy**: Greedy Kempe solves in $378.5 \mu\text{s}$ ($25 \mu\text{s}$/program) with near-optimal quality (21 spills). Exact DSATUR BnB achieves the true global minimum (16 spills) but incurs a **$524\times$ compilation time penalty** ($198.4 \text{ ms}$). In production, Greedy is ideal for JIT/interactive compilers, while Exact BnB is justified for `-O3` embedded/firmware release builds where register pressure directly affects battery and silicon cache.
 - **Failure Cases & Overhead**: Dead code elimination without alias analysis can be unsafe in languages with pointer aliasing or side effects (e.g. volatile memory); in our TAC IR, side-effecting operations (`PRINT`, `CALL`) are strictly tagged to prevent invalid elimination.
 - **Theoretical vs. Simulated vs. Measured Status**: Fully measured on real C++17 compilation and virtual machine execution.
+
+---
+
+## 7. Links to Code and Results
+- **Source Code**:
+  - MiniLang TAC IR & Stack VM: [`F_compiler/src/toy_compiler.hpp`](../F_compiler/src/toy_compiler.hpp)
+  - 5 IR Optimization Passes: [`F_compiler/src/toy_optimizer.hpp`](../F_compiler/src/toy_optimizer.hpp)
+  - Register Allocation (Kempe & DSATUR BnB): [`F_compiler/src/toy_regalloc.hpp`](../F_compiler/src/toy_regalloc.hpp)
+  - Equivalence Harness & Unit Tests: [`F_compiler/tests/test_main.cpp`](../F_compiler/tests/test_main.cpp)
+- **Empirical Results Files**:
+  - IR Optimization Passes Summary: [`F_compiler/results/optimization_passes_benchmark.csv`](../F_compiler/results/optimization_passes_benchmark.csv)
+  - Register Allocation Spills Log: [`F_compiler/results/register_allocation_benchmark.csv`](../F_compiler/results/register_allocation_benchmark.csv)
+  - Stack VM Execution Cycle Profile: [`F_compiler/results/test_execution.csv`](../F_compiler/results/test_execution.csv)
+  - Generated Compiler Benchmark Plot: [`F_compiler/results/compiler_optimization_benchmark.png`](../F_compiler/results/compiler_optimization_benchmark.png)

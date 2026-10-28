@@ -130,6 +130,15 @@ Source: [`barren_plateau_benchmark.csv`](file:///c:/Users/ADMIN/Desktop/OT_Ass8/
 | **8** | 256 | $4.1721 \times 10^{-3}$ | $5.8192 \times 10^{-2}$ | $3.91 \times 10^{-3}$ | **$13.95\times$** |
 | **10** | 1024 | **$9.9471 \times 10^{-4}$** | **$8.9696 \times 10^{-3}$** | **$9.77 \times 10^{-4}$** | **$9.02\times$** |
 
+### 5.7 Visualizations & Empirical Plots
+
+#### Figure C.1: Quantum Variational Optimization, Finite Shot Noise & Barren Plateaus
+![Figure C.1: Quantum Variational Optimization, Finite Shot Noise & Barren Plateaus](../C_quantum/results/qaoa_vqe_noise_scaling.png)
+- *Panel (a) QAOA Approximation Ratio*: Monotonically improves from $0.740 \pm 0.063$ at $p=1$ to $0.833 \pm 0.045$ at $p=3$ across 10 deterministic random seeds.
+- *Panel (b) VQE Energy Error*: Ground state energy errors on molecular $H_2$ reach machine float64 precision ($\sim 10^{-15}\text{ Ha}$) under BFGS and COBYLA.
+- *Panel (c) Finite Shot Projection Noise*: Observable estimation error scales strictly as $\mathcal{O}(1/\sqrt{S})$ from $S=100$ to $S=10,000$ measurement shots.
+- *Panel (d) Barren Plateaus*: Global cost function gradient variance exhibits exponential vanishing $\text{Var}[\partial_\theta] \propto 2^{-n}$, dropping below $10^{-3}$ at $n=10$, whereas local observables preserve polynomial gradient variance.
+
 ---
 
 ## 6. Limits of Embedding QUBO on Quantum Annealing Hardware
@@ -163,3 +172,19 @@ Embedding real-world QUBO problems onto physical annealing hardware faces severe
 - **Status Classification**:
   - *All Track C results are SIMULATED* on classical hardware via Qiskit 2.6 and Qiskit Aer 0.18 (`[SIMULATED - NOT PHYSICAL HARDWARE]`).
   - *Exact Diagonalization & Brute-Force*: Formally verified against NumPy `linalg.eigh` and Track B discrete solvers.
+
+---
+
+## 8. Links to Code and Results
+- **Source Code**:
+  - QAOA Max-Cut Implementation: [`C_quantum/src/qaoa_maxcut.py`](../C_quantum/src/qaoa_maxcut.py)
+  - VQE Molecular $H_2$ & TFIM: [`C_quantum/src/vqe.py`](../C_quantum/src/vqe.py)
+  - QNN Classifier & Quantum Gradients: [`C_quantum/src/qnn_classifier.py`](../C_quantum/src/qnn_classifier.py)
+  - Hardware Noise & Barren Plateaus: [`C_quantum/src/quantum_noise_barren_plateaus.py`](../C_quantum/src/quantum_noise_barren_plateaus.py)
+- **Empirical Results Files**:
+  - QAOA Scaling Benchmark: [`C_quantum/results/qaoa_benchmark.csv`](../C_quantum/results/qaoa_benchmark.csv)
+  - VQE Ground State Energies: [`C_quantum/results/vqe_benchmark.csv`](../C_quantum/results/vqe_benchmark.csv)
+  - Finite Measurement Shots: [`C_quantum/results/finite_shot_benchmark.csv`](../C_quantum/results/finite_shot_benchmark.csv)
+  - Hardware Depolarizing Noise: [`C_quantum/results/hardware_noise_benchmark.csv`](../C_quantum/results/hardware_noise_benchmark.csv)
+  - Barren Plateau Variance Log: [`C_quantum/results/barren_plateau_benchmark.csv`](../C_quantum/results/barren_plateau_benchmark.csv)
+  - Generated Empirical Plot: [`C_quantum/results/qaoa_vqe_noise_scaling.png`](../C_quantum/results/qaoa_vqe_noise_scaling.png)

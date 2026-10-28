@@ -124,6 +124,13 @@ Exported to [`maxcut_qubo.json`](file:///c:/Users/ADMIN/Desktop/OT_Ass8/B_discre
   - QUBO Exact Optimum: **$1.71139$**
   - Simulated Annealing (10 runs, seeds 301..310): **$1.67668 \pm 0.07317$** (Mean $\pm$ Std)
 
+### 5.4 Visualizations & Empirical Plots
+
+#### Figure B.1: Knapsack Solvers Execution Scaling and Heuristic Optimality Gap
+![Figure B.1: Knapsack Solvers Execution Scaling and Heuristic Optimality Gap](../B_discrete/results/knapsack_scaling.png)
+- *Panel (a) Execution Latency vs Size*: Dynamic Programming scales pseudo-polynomially with capacity $O(N \cdot W)$, consuming $116.28\text{ ms}$ at $N=500$. Branch-and-Bound with Dantzig fractional LP relaxation achieves massive pruning, solving $N=500$ in just $5.38\text{ ms}$ ($21.6\times$ faster than DP). Google OR-Tools SCIP ILP solves $N=500$ in $31.12\text{ ms}$.
+- *Panel (b) Greedy Optimality Gap*: Greedy sorting by $v_i / w_i$ exhibits a 6.37% optimality gap at $N=10$ and 0.41% at $N=100$ due to residual capacity fragmentation, whereas DP, B&B, and ILP guarantee 0.00% gap.
+
 ---
 
 ## 6. Analysis, Trade-offs & Limitations
@@ -145,3 +152,16 @@ Exported to [`maxcut_qubo.json`](file:///c:/Users/ADMIN/Desktop/OT_Ass8/B_discre
 - **Knapsack Runtimes & Values**: Measured on hardware (WSL Ubuntu 24.04 x86_64, `std::chrono::steady_clock`).
 - **Exact Equivalence (DP == B&B == ILP)**: Formally measured and verified on identical instances.
 - **Max-Cut & Feature Selection Annealing**: Simulated classically via Metropolis-Hastings Markov chains (10 seeds, Mean $\pm$ Std).
+
+---
+
+## 7. Links to Code and Results
+- **Source Code**:
+  - Knapsack Solvers (Greedy, DP, B&B, ILP): [`B_discrete/src/knapsack_solvers.hpp`](../B_discrete/src/knapsack_solvers.hpp)
+  - Max-Cut QUBO & Ising Conversion: [`B_discrete/src/qubo_ising.hpp`](../B_discrete/src/qubo_ising.hpp)
+  - mRMR Feature Selection QUBO: [`B_discrete/src/feature_selection_qubo.hpp`](../B_discrete/src/feature_selection_qubo.hpp)
+  - Unit Tests: [`B_discrete/tests/test_main.cpp`](../B_discrete/tests/test_main.cpp)
+- **Empirical Results Files**:
+  - Knapsack Scaling Benchmark: [`B_discrete/results/knapsack_benchmark.csv`](../B_discrete/results/knapsack_benchmark.csv)
+  - Max-Cut QUBO Matrix & Partitions: [`B_discrete/results/maxcut_qubo.json`](../B_discrete/results/maxcut_qubo.json)
+  - Generated Scaling Plot: [`B_discrete/results/knapsack_scaling.png`](../B_discrete/results/knapsack_scaling.png)

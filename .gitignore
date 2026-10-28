@@ -34,6 +34,10 @@ H_dbms/data/
 H_dbms/tpch-tool/
 *.tbl
 
+# Node modules
+node_modules/
+package-lock.json
+
 # Coverage and Profiling Artifacts
 *.gcda
 *.gcno
